@@ -1,15 +1,14 @@
-from typing import Union
-
 from fastapi import FastAPI
+from db.database import engine, SessionLocal, Base
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-@app.get("/")
-async def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+def get_db():
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()
