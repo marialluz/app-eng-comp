@@ -1,14 +1,9 @@
 from fastapi import FastAPI
-from db.database import engine, SessionLocal, Base
+from app.routers import user_router
+from app.db.database import engine, Base
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-
-def get_db():
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
+app.include_router(user_router.router, prefix="/api")
