@@ -13,13 +13,10 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
     def get_permissions(self):
-        if self.action == "create":
-            return []
-
         if self.action in ("destroy", "update", "partial_update"):
             return [permissions.IsAuthenticated(), IsSelf()]
 
-        return [permissions.IsAuthenticated()]
+        return []
 
 
 class CurrentUserView(views.APIView):
