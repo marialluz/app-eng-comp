@@ -16,7 +16,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             return []
 
-        if self.action == "destroy":
+        if self.action in ("destroy", "update", "partial_update"):
             return [permissions.IsAuthenticated(), IsSelf()]
 
         return [permissions.IsAuthenticated()]
