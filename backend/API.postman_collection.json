@@ -1,0 +1,1038 @@
+{
+	"info": {
+		"_postman_id": "4a8ee193-7eee-4808-a72f-44eccbc97440",
+		"name": "API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "25610792"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Create Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"mateus\",\n    \"password\": \"oi123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/auth/token/"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMjgyMzg5NSwiaWF0IjoxNzMyNzM3NDk1LCJqdGkiOiJkMDQ4ZTUwMmVmNmQ0ZGY4OTk3MzFlMWZmYWVkMTEyZSIsInVzZXJfaWQiOjN9.LleQ-6KgYOJJbxPgNdHQ84pAW-WM4YMjRu5j3BveBto\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/auth/token/refresh/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"mateus\",\n    \"email\": \"mateus@email.com\",\n    \"password\":\"oi123\",\n    \"confirm_password\": \"oi123\",\n    \"is_teacher\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/user/"
+					},
+					"response": []
+				},
+				{
+					"name": "User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzI2NzExLCJpYXQiOjE3MzIzMjY0MTEsImp0aSI6IjVjN2E5NmE3ZGEzYzQzODNiZDRkOTllNjkwMWJkZWM0IiwidXNlcl9pZCI6Mn0.atVzcnbLS6CHNklF9ZRial7Lma1AgY-oRHbuCdGi_xI"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/user/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/user/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzI2NzExLCJpYXQiOjE3MzIzMjY0MTEsImp0aSI6IjVjN2E5NmE3ZGEzYzQzODNiZDRkOTllNjkwMWJkZWM0IiwidXNlcl9pZCI6Mn0.atVzcnbLS6CHNklF9ZRial7Lma1AgY-oRHbuCdGi_xI"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/user/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Current User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNzM3ODI4LCJpYXQiOjE3MzI3Mzc0OTUsImp0aSI6ImRmOWQ0OGJkZTg5ZjQyOWJhMjEwMWNiMmJkYTM3ODIyIiwidXNlcl9pZCI6M30._snkoTSt1gWa6Bxh5b2Q7IBsTJxJTPhnMc4XCD2fqS0"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/user/me/"
+					},
+					"response": []
+				},
+				{
+					"name": "Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNzM3ODI4LCJpYXQiOjE3MzI3Mzc0OTUsImp0aSI6ImRmOWQ0OGJkZTg5ZjQyOWJhMjEwMWNiMmJkYTM3ODIyIiwidXNlcl9pZCI6M30._snkoTSt1gWa6Bxh5b2Q7IBsTJxJTPhnMc4XCD2fqS0"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/user/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subject",
+			"item": [
+				{
+					"name": "Subject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNzg1NDc4LCJpYXQiOjE3MzM3ODUxNzgsImp0aSI6IjY2MzdkZjRhOTNiMTQ4NzI4M2JiZjU1NDgwYTYwMTQ4IiwidXNlcl9pZCI6MX0.FU3ASEM0Wo3KLFd-pgjnWqrlxda2CPDRBtiWj3TOloU"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"ECT3203\",\n    \"name\": \"AMBIENTE E DESENVOLVIMENTO\",\n    \"period\": \"1\",\n    \"prerequisites\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/subject/"
+					},
+					"response": []
+				},
+				{
+					"name": "Subject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNzg1NDc4LCJpYXQiOjE3MzM3ODUxNzgsImp0aSI6IjY2MzdkZjRhOTNiMTQ4NzI4M2JiZjU1NDgwYTYwMTQ4IiwidXNlcl9pZCI6MX0.FU3ASEM0Wo3KLFd-pgjnWqrlxda2CPDRBtiWj3TOloU"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/subject/:code/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"subject",
+								":code",
+								""
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": "ECT3203"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Subject",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/subject/:code/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"subject",
+								":code",
+								""
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Subject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzMyNzU1LCJpYXQiOjE3MzIzMzI0NTUsImp0aSI6IjkwNTRlNDQ1MmUwOTQ4NGViNzUxZGFlZjI3OWU3Y2E4IiwidXNlcl9pZCI6MX0.dmenuCVKJmdHtosOJTvwzArT-nOoWl1EWMp9w6v35pI"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/subject/:code/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"subject",
+								":code",
+								""
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Subject Prerequisites",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNzM3ODI4LCJpYXQiOjE3MzI3Mzc0OTUsImp0aSI6ImRmOWQ0OGJkZTg5ZjQyOWJhMjEwMWNiMmJkYTM3ODIyIiwidXNlcl9pZCI6M30._snkoTSt1gWa6Bxh5b2Q7IBsTJxJTPhnMc4XCD2fqS0"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/subject/:code/prerequisites/?deep=true",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"subject",
+								":code",
+								"prerequisites",
+								""
+							],
+							"query": [
+								{
+									"key": "deep",
+									"value": "true"
+								}
+							],
+							"variable": [
+								{
+									"key": "code",
+									"value": "ECT3306"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Subjects",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNzM3ODI4LCJpYXQiOjE3MzI3Mzc0OTUsImp0aSI6ImRmOWQ0OGJkZTg5ZjQyOWJhMjEwMWNiMmJkYTM3ODIyIiwidXNlcl9pZCI6M30._snkoTSt1gWa6Bxh5b2Q7IBsTJxJTPhnMc4XCD2fqS0"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/subject/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "History",
+			"item": [
+				{
+					"name": "History Subject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMzQ5OTM5LCJpYXQiOjE3MzMzNDk2MzksImp0aSI6ImY5NThkZjE0NGEwNzRjYzc5YTFkOTYzOTAwY2QyY2Q2IiwidXNlcl9pZCI6Mn0.Cbo-3hEEdlFrBXHExss04nYM1gHAkODcBx8SwAQs2GE"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"subject\": \"ECT3101\",\r\n    \"average\": \"10\",\r\n    \"attended_in_period\": \"1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/history/"
+					},
+					"response": []
+				},
+				{
+					"name": "History Subject",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/history/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"history",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "History Subject",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/history/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"history",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "History Subject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMzQ5OTM5LCJpYXQiOjE3MzMzNDk2MzksImp0aSI6ImY5NThkZjE0NGEwNzRjYzc5YTFkOTYzOTAwY2QyY2Q2IiwidXNlcl9pZCI6Mn0.Cbo-3hEEdlFrBXHExss04nYM1gHAkODcBx8SwAQs2GE"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/history/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"history",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Full History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/history/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Directory",
+			"item": [
+				{
+					"name": "Directory",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDE5MDk3LCJpYXQiOjE3MzI0MTg3OTcsImp0aSI6Ijk4YzdiYTA2OTQzNTQ5MjU5OTA5MjhiNDE4NjI3MTQwIiwidXNlcl9pZCI6Mn0.MpLskh6cUdVuvZwc_zzpoOn2wZMUqLiukGh4T8iDapo"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subject\": \"ECT3101\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/directory/"
+					},
+					"response": []
+				},
+				{
+					"name": "Directory",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDExNzI4LCJpYXQiOjE3MzI0MTE0MjgsImp0aSI6IjA2YTk3ZDg2YzliNDQ1MWI5N2Y2NDdhMTU0Zjk4ZTU2IiwidXNlcl9pZCI6MX0.Iefw8oSafyRJVqZwLeiYXBC6Dysl8G46WP0CCfBB1aY"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/directory/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"directory",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Directory",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDExNzI4LCJpYXQiOjE3MzI0MTE0MjgsImp0aSI6IjA2YTk3ZDg2YzliNDQ1MWI5N2Y2NDdhMTU0Zjk4ZTU2IiwidXNlcl9pZCI6MX0.Iefw8oSafyRJVqZwLeiYXBC6Dysl8G46WP0CCfBB1aY"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/directory/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"directory",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Directories",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDE5MjE3LCJpYXQiOjE3MzI0MTg5MTcsImp0aSI6IjU0YjdhMzg1MWViZTQyYWZhOTY3NTRkOTI1OWUxMzA1IiwidXNlcl9pZCI6Mn0.pwvW0Q_EFamdWtDSFfFICd2HLi5qBHMfA6WRLTJ3VKw"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/directory/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Files",
+			"item": [
+				{
+					"name": "File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDIwMTUzLCJpYXQiOjE3MzI0MTk4NTMsImp0aSI6ImIwNmVmNWY5YTU0ZTQ5ZDVhNzEyY2NkYTFhY2NjNzMyIiwidXNlcl9pZCI6Mn0.yB_Si0s5M4VvzVr6WqwzIFRKqu9SS4v_7fCu7FGC12c"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/mateus/Downloads/Controle___Relatório_1.pdf"
+								},
+								{
+									"key": "name",
+									"value": "Relatório de controle 2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/directory/:directory_id/file/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"directory",
+								":directory_id",
+								"file",
+								""
+							],
+							"variable": [
+								{
+									"key": "directory_id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDE5MTIwLCJpYXQiOjE3MzI0MTg4MjAsImp0aSI6IjcxNTc0NDYzYzJhZjQyZGFiYWFhZjEyYjA1OGNjMjI5IiwidXNlcl9pZCI6MX0.S2iaGnVaeG4F8iuKCfG44qMhDLpOMdavMvX0HllxmCo"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shared_to_user\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/directory/:directory_id/file/:file_id/share/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"directory",
+								":directory_id",
+								"file",
+								":file_id",
+								"share",
+								""
+							],
+							"variable": [
+								{
+									"key": "directory_id",
+									"value": "2"
+								},
+								{
+									"key": "file_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDEyOTE2LCJpYXQiOjE3MzI0MTI2MTYsImp0aSI6IjYyMzBkNWY5NGM5NzQ3YjQ4Nzc4NTRiYWYzZWU3ODdiIiwidXNlcl9pZCI6MX0.A2_yccO1C9_8lu5zXCin4j4H5VZV_7JpgpKKXx9_s3E"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/directory/:directory_id/file/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"directory",
+								":directory_id",
+								"file",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "directory_id",
+									"value": "2"
+								},
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Files",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDE5MjE3LCJpYXQiOjE3MzI0MTg5MTcsImp0aSI6IjU0YjdhMzg1MWViZTQyYWZhOTY3NTRkOTI1OWUxMzA1IiwidXNlcl9pZCI6Mn0.pwvW0Q_EFamdWtDSFfFICd2HLi5qBHMfA6WRLTJ3VKw"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/directory/:directory_id/file/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"directory",
+								":directory_id",
+								"file",
+								""
+							],
+							"variable": [
+								{
+									"key": "directory_id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMzQ4NzMxLCJpYXQiOjE3MzMzNDg0MzEsImp0aSI6ImJmNzgxODUzODcyODQyNmZhZGRkZjdmODc4NjMzNTQ5IiwidXNlcl9pZCI6MX0.kKs2omgJ0mDaM5eMgD1wWhl812CbuIZ-M3zla62jodg"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "text",
+									"value": "Texto sobre a postagem da coordenação",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{host}}/post/"
+					},
+					"response": []
+				},
+				{
+					"name": "Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMzQ4NzMxLCJpYXQiOjE3MzMzNDg0MzEsImp0aSI6ImJmNzgxODUzODcyODQyNmZhZGRkZjdmODc4NjMzNTQ5IiwidXNlcl9pZCI6MX0.kKs2omgJ0mDaM5eMgD1wWhl812CbuIZ-M3zla62jodg"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/post/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"post",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/post/"
+					},
+					"response": []
+				},
+				{
+					"name": "Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMzQ4NzMxLCJpYXQiOjE3MzMzNDg0MzEsImp0aSI6ImJmNzgxODUzODcyODQyNmZhZGRkZjdmODc4NjMzNTQ5IiwidXNlcl9pZCI6MX0.kKs2omgJ0mDaM5eMgD1wWhl812CbuIZ-M3zla62jodg"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"Mudou\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/post/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"post",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMzQ4NzMxLCJpYXQiOjE3MzMzNDg0MzEsImp0aSI6ImJmNzgxODUzODcyODQyNmZhZGRkZjdmODc4NjMzNTQ5IiwidXNlcl9pZCI6MX0.kKs2omgJ0mDaM5eMgD1wWhl812CbuIZ-M3zla62jodg"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/post/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"post",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Schedule",
+			"item": [
+				{
+					"name": "Schedule",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNDMzNDc3LCJpYXQiOjE3MzM0MzMxNzcsImp0aSI6ImI1YzcyNTYwZWNlMzRkOWRiMTNjMjQxOGI0YzMzMWMzIiwidXNlcl9pZCI6MX0.R2eqCUlNuClZA5pRjFwTyLIeo_jen6uSdmy-AYkgjc0"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"subjects\": [\"ECT3101\", \"ECT3102\", \"ECT3103\"],\r\n    \"period\": \"2034.2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/schedule/"
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNDMzODE2LCJpYXQiOjE3MzM0MzM1MTYsImp0aSI6IjVmNjZjZGU0YWFjODQ1YTM4ODM4ZDNiYzRhNmQwNmZhIiwidXNlcl9pZCI6MX0.hUI5y-6GW-D9h1ImmORuXHg8-3UCajyQT1RVQh1B4qE"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/schedule/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"schedule",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "12"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedules",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNDMzODE2LCJpYXQiOjE3MzM0MzM1MTYsImp0aSI6IjVmNjZjZGU0YWFjODQ1YTM4ODM4ZDNiYzRhNmQwNmZhIiwidXNlcl9pZCI6MX0.hUI5y-6GW-D9h1ImmORuXHg8-3UCajyQT1RVQh1B4qE"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/schedule/"
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"subjects\": [],\r\n    \"semester\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/schedule/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"schedule",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNDMyODUyLCJpYXQiOjE3MzM0MzI1NTIsImp0aSI6Ijk1MDI3ZDhhMzk3NjQxOWQ5M2JiYzkwMGVmMTU3YWFlIiwidXNlcl9pZCI6MX0.VA3zvr8lh36PzdF7CVTADYcHt_VtKBz-8Oo0tyRK8DY"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/schedule/:id/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"schedule",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

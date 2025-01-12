@@ -1,55 +1,6 @@
-# Ambiente virtual do Python
-venv/
-.env
-
-# Arquivos de compilação do Python
+# Ignorar arquivos de cache do Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 
-# Diretórios de logs
-logs/
-*.log
-
-# Configurações locais do editor
-.vscode/
-.idea/
-
-# Arquivos de banco de dados local
-*.sqlite3
-
-# Arquivos de pacotes Python
-*.egg
-*.egg-info/
-dist/
-build/
-eggs/
-parts/
-sdist/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg-info/
-
-# Cache do pip
-pip-selfcheck.json
-
-# Caches do Pytest
-.cache/
-
-# Cache da cobertura de testes
-htmlcov/
-.coverage
-.tox/
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-
-# Arquivos de lock e dependências
-Pipfile.lock
-poetry.lock
-
-# Arquivos de dumps
-*.dump
+# Ignorar o banco de dados SQLite
+db.sqlite3
