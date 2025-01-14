@@ -1,4 +1,8 @@
 import { RouteObject } from 'react-router-dom';
+import DirectoryList from './pages/DirectoryList';
+import DirectoryView from './pages/DirectoryView';
+import FileShare from './pages/FileShare';
+import FileUpload from './pages/FileUpload';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -42,28 +46,28 @@ export const routes: RouteObject[] = [
         element: <TeacherDashboard />,
       },
     ],
-  },
-//   {
-//     path: '/materials',
-//     children: [
-//       {
-//         path: '',
-//         element: <DirectoryList />,
-//       },
-//       {
-//         path: ':directoryId',
-//         element: <DirectoryView />,
-//       },
-//       {
-//         path: 'upload',
-//         element: <FileUpload />,
-//       },
-//       {
-//         path: 'share/:fileId',
-//         element: <FileShare />,
-//       },
-//     ],
-//   },
+   },  
+   {
+    path: '/materials',
+    children: [
+      {
+        path: '',
+        element: <DirectoryList />,
+      },
+      {
+        path: ':directoryId',
+        element: <DirectoryView />,
+      },
+      {
+        path: 'upload',
+        element: <FileUpload />,
+      },
+      {
+        path: 'share/:fileId',
+        element: <FileShare />,
+      },
+    ],
+   },
 //   {
 //     path: '/curriculum',
 //     children: [
