@@ -17,19 +17,6 @@ import SchedulePlanner from './pages/schedule/SchedulePlanner';
 import StudentDashboard from './pages/StudentDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 
-// import DirectoryList from './pages/Materials/DirectoryList';
-// import DirectoryView from './pages/Materials/DirectoryView';
-// import FileUpload from './pages/Materials/FileUpload';
-// import FileShare from './pages/Materials/FileShare';
-// import CurriculumStructure from './pages/Curriculum/CurriculumStructure';
-// import SubjectDetails from './pages/Curriculum/SubjectDetails';
-// import PreRequisites from './pages/Curriculum/PreRequisites';
-// import SchedulePlanner from './pages/Schedule/SchedulePlanner';
-// import ScheduleList from './pages/Schedule/ScheduleList';
-// import PostList from './pages/Posts/PostList';
-// import PostCreate from './pages/Posts/PostCreate';
-// import PostView from './pages/Posts/PostView';
-
 export const routes: RouteObject[] = [
   {
     path: '/',

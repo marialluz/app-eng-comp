@@ -1,10 +1,10 @@
-import React from "react";
-import { Drawer, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Importando o useNavigate
+import AnnouncementIcon from "@mui/icons-material/Announcement";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import FolderIcon from "@mui/icons-material/Folder";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import AnnouncementIcon from "@mui/icons-material/Announcement";
+import { Button, Drawer } from "@mui/material";
+import React from "react";
+import { useNavigate } from "react-router-dom"; // Importando o useNavigate
 
 interface SidebarProps {
   open: boolean;
@@ -15,11 +15,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const navigate = useNavigate();
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon />, path: "/" },
-    { text: "Materiais", icon: <FolderIcon />, path: "/materiais" },
+    { text: "Materiais", icon: <FolderIcon />, path: "/materials" },
     { text: "Prof", icon: <FolderIcon />, path: "/dashboard/teacher" },
     { text: "Aluno", icon: <FolderIcon />, path: "/dashboard/student" },
-    { text: "Grade Curricular", icon: <CalendarTodayIcon />, path: "/grade" },
-    { text: "Notícias", icon: <AnnouncementIcon />, path: "/noticias" },
+    { text: "Grade Curricular", icon: <CalendarTodayIcon />, path: "/curriculum" },
+    { text: "Notícias", icon: <AnnouncementIcon />, path: "/news" },
   ];
 
   const handleNavigate = (path: string) => {
