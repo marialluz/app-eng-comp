@@ -1,19 +1,19 @@
 import { Send } from '@mui/icons-material';
 import {
-    Box,
-    Breadcrumbs,
-    Button,
-    Chip,
-    Link,
-    Paper,
-    TextField,
-    Typography
+  Box,
+  Breadcrumbs,
+  Button,
+  Chip,
+  Link,
+  Paper,
+  TextField,
+  Typography
 } from '@mui/material';
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import MainLayout from '../../layouts/MainLayout';
 
 const FileShare = () => {
-  const { fileId } = useParams();
   const navigate = useNavigate();
   const [recipients, setRecipients] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -36,56 +36,58 @@ const FileShare = () => {
   };
 
   return (
-    <Box p={3}>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
-        <Link color="inherit" href="/dashboard/student">
-          Dashboard
-        </Link>
-        <Link color="inherit" href="/materials">
-          Materiais
-        </Link>
-        <Typography color="text.primary">Compartilhar</Typography>
-      </Breadcrumbs>
+    <MainLayout>
+      <Box p={3}>
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
+          <Link color="inherit" href="/dashboard/student">
+            Dashboard
+          </Link>
+          <Link color="inherit" href="/materials">
+            Materiais
+          </Link>
+          <Typography color="text.primary">Compartilhar</Typography>
+        </Breadcrumbs>
 
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Compartilhar Arquivo
-        </Typography>
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Compartilhar Arquivo
+          </Typography>
 
-        <form onSubmit={handleShare}>
-          <TextField
-            fullWidth
-            label="Email do destinatário"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleAddRecipient}
-            sx={{ mb: 2 }}
-            helperText="Pressione Enter para adicionar mais destinatários"
-          />
+          <form onSubmit={handleShare}>
+            <TextField
+              fullWidth
+              label="Email do destinatário"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleAddRecipient}
+              sx={{ mb: 2 }}
+              helperText="Pressione Enter para adicionar mais destinatários"
+            />
 
-          <Box sx={{ mb: 2 }}>
-            {recipients.map((recipient) => (
-              <Chip
-                key={recipient}
-                label={recipient}
-                onDelete={() => handleDelete(recipient)}
-                sx={{ mr: 1, mb: 1 }}
-              />
-            ))}
-          </Box>
+            <Box sx={{ mb: 2 }}>
+              {recipients.map((recipient) => (
+                <Chip
+                  key={recipient}
+                  label={recipient}
+                  onDelete={() => handleDelete(recipient)}
+                  sx={{ mr: 1, mb: 1 }}
+                />
+              ))}
+            </Box>
 
-          <Button
-            type="submit"
-            variant="contained"
-            startIcon={<Send />}
-            fullWidth
-            disabled={recipients.length === 0}
-          >
-            Compartilhar
-          </Button>
-        </form>
-      </Paper>
-    </Box>
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={<Send />}
+              fullWidth
+              disabled={recipients.length === 0}
+            >
+              Compartilhar
+            </Button>
+          </form>
+        </Paper>
+      </Box>
+    </MainLayout>
   );
 };
 

@@ -3,7 +3,6 @@ import {
   Box,
   Breadcrumbs,
   Button,
-  Link,
   List,
   ListItem,
   ListItemButton,
@@ -32,11 +31,10 @@ const DirectoryList = () => {
       </Button>
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <Box p={3}>
-          <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
-            <Link color="inherit" href="/dashboard/student">
-              Dashboard
-            </Link>
-            <Typography color="text.primary">Materiais</Typography>
+          <Breadcrumbs  sx={{ mb: 3 }}>
+            <Typography variant="h4">
+              Materiais
+            </Typography>
           </Breadcrumbs>
           <Box display="flex" justifyContent="flex-end" mb={2} gap={2}>
             <Button

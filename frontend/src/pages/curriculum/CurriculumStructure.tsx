@@ -3,7 +3,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Box,
   Button,
   Chip,
   Container,
@@ -63,6 +62,9 @@ const CurriculumStructure: React.FC = () => {
 
   return (
     <MainLayout>
+      <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
+            Voltar para o Dashboard
+      </Button>
       <Container maxWidth="lg">
         <Typography variant="h4" gutterBottom sx={{ mt: 4, mb: 2 }}>
           Estrutura Curricular - Engenharia de Computação
@@ -127,11 +129,6 @@ const CurriculumStructure: React.FC = () => {
             </Accordion>
           ))}
         </Paper>
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
-            Voltar para o Dashboard
-          </Button>
-        </Box>
       </Container>
     </MainLayout>
   );
