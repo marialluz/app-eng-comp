@@ -1,8 +1,8 @@
-import React from 'react';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import React from 'react';
+import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
-import Footer from '../components/Footer';
 
 const theme = createTheme({
   palette: {
@@ -43,7 +43,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, hideSidebar = false }
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100vw' }}>
         <Navbar toggleSidebar={toggleSidebar} />
         <Box sx={{ display: 'flex', flex: 1 }}>
           {!hideSidebar && <Sidebar open={sidebarOpen} onClose={toggleSidebar} />}

@@ -1,83 +1,109 @@
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from '@mui/icons-material';
 import {
-    Alert,
-    Box,
-    Button,
-    Container,
-    Grid,
-    IconButton,
-    List,
-    ListItem,
-    ListItemSecondaryAction,
-    ListItemText,
-    Paper,
-    Snackbar,
-    TextField,
-    Typography
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemSecondaryAction,
+  ListItemText,
+  MenuItem,
+  Paper,
+  Select,
+  Snackbar,
+  TextField,
+  Typography
 } from '@mui/material';
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
 
 interface Subject {
-  id: string;
+  code: string;
   name: string;
-  credits: number;
+  period: string;
   prerequisites: string[];
 }
 
 interface Semester {
-  id: number;
+  period: string;
   subjects: Subject[];
 }
 
-const mockSubjects: Subject[] = [
-  { id: 'COMP101', name: 'Introdução à Computação', credits: 4, prerequisites: [] },
-  { id: 'MATH101', name: 'Cálculo I', credits: 4, prerequisites: [] },
-  { id: 'PHYS101', name: 'Física I', credits: 4, prerequisites: [] },
-  { id: 'COMP201', name: 'Estruturas de Dados', credits: 4, prerequisites: ['COMP101'] },
-  { id: 'MATH201', name: 'Cálculo II', credits: 4, prerequisites: ['MATH101'] },
-  { id: 'PHYS201', name: 'Física II', credits: 4, prerequisites: ['PHYS101'] },
-  // Add more subjects as needed
-];
-
 const SchedulePlanner: React.FC = () => {
   const navigate = useNavigate();
-  const [semesters, setSemesters] = useState<Semester[]>([{ id: 1, subjects: [] }]);
-  const [selectedSubject, setSelectedSubject] = useState<string>('');
-  const [selectedSemester, setSelectedSemester] = useState<number>(1);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
+  const [selectedSubjectCode, setSelectedSubjectCode] = useState<string>('');
+  const [currentPeriod, setCurrentPeriod] = useState<string>('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get<Subject[]>('/api/subjects');
+        if (Array.isArray(response.data)) {
+          setSubjects(response.data);
+        } else {
+          throw new Error('Received invalid data format for subjects');
+        }
+      } catch (error) {
+        console.error('Error fetching subjects:', error);
+        setError('Failed to load subjects. Please try again later.');
+        setSnackbar({ open: true, message: 'Error fetching subjects', severity: 'error' });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
 
   const handleAddSubject = () => {
-    if (selectedSubject && selectedSemester) {
-      const subject = mockSubjects.find(s => s.id === selectedSubject);
-      if (subject) {
-        if (checkPrerequisites(subject, selectedSemester)) {
-          setSemesters(prevSemesters => {
-            const newSemesters = [...prevSemesters];
-            const semesterIndex = newSemesters.findIndex(s => s.id === selectedSemester);
-            if (semesterIndex !== -1) {
-              newSemesters[semesterIndex].subjects.push(subject);
-            } else {
-              newSemesters.push({ id: selectedSemester, subjects: [subject] });
-            }
-            return newSemesters.sort((a, b) => a.id - b.id);
-          });
-          setSnackbar({ open: true, message: 'Disciplina adicionada com sucesso!', severity: 'success' });
-        } else {
-          setSnackbar({ open: true, message: 'Pré-requisitos não atendidos!', severity: 'error' });
-        }
+    if (selectedSubjectCode && currentPeriod) {
+      const subject = subjects.find(s => s.code === selectedSubjectCode);
+      if (!subject) {
+        setSnackbar({ open: true, message: 'Subject not found', severity: 'error' });
+        return;
+      }
+
+      if (checkPrerequisites(subject)) {
+        setSemesters(prevSemesters => {
+          const existingSemester = prevSemesters.find(s => s.period === currentPeriod);
+          if (existingSemester) {
+            return prevSemesters.map(s => 
+              s.period === currentPeriod 
+                ? { ...s, subjects: [...s.subjects, subject] }
+                : s
+            );
+          } else {
+            return [...prevSemesters, { period: currentPeriod, subjects: [subject] }];
+          }
+        });
+        setSnackbar({ open: true, message: 'Disciplina adicionada com sucesso!', severity: 'success' });
+      } else {
+        setSnackbar({ open: true, message: 'Pré-requisitos não atendidos!', severity: 'error' });
       }
     }
   };
 
-  const handleRemoveSubject = (semesterId: number, subjectId: string) => {
+  const handleRemoveSubject = (period: string, subjectCode: string) => {
     setSemesters(prevSemesters => {
       return prevSemesters.map(semester => {
-        if (semester.id === semesterId) {
+        if (semester.period === period) {
           return {
             ...semester,
-            subjects: semester.subjects.filter(subject => subject.id !== subjectId)
+            subjects: semester.subjects.filter(subject => subject.code !== subjectCode)
           };
         }
         return semester;
@@ -85,25 +111,60 @@ const SchedulePlanner: React.FC = () => {
     });
   };
 
-  const checkPrerequisites = (subject: Subject, semesterId: number): boolean => {
-    const previousSemesters = semesters.filter(s => s.id < semesterId);
-    const completedSubjects = previousSemesters.flatMap(s => s.subjects.map(sub => sub.id));
-    return subject.prerequisites.every(prereq => completedSubjects.includes(prereq));
+  const checkPrerequisites = (subject: Subject): boolean => {
+    const allPlannedSubjects = semesters.flatMap(s => s.subjects.map(sub => sub.code));
+    return subject.prerequisites.every(prereq => allPlannedSubjects.includes(prereq));
   };
 
-  const handleSavePlan = () => {
-    // Here you would typically save the plan to a backend or local storage
-    console.log('Saving plan:', semesters);
-    setSnackbar({ open: true, message: 'Plano salvo com sucesso!', severity: 'success' });
+  const handleSavePlan = async () => {
+    try {
+      const planData = {
+        subjects: semesters.flatMap(semester => semester.subjects.map(subject => subject.code)),
+        period: currentPeriod
+      };
+      await axios.post('/api/schedule/', planData);
+      setSnackbar({ open: true, message: 'Plano salvo com sucesso!', severity: 'success' });
+    } catch (error) {
+      console.error('Error saving plan:', error);
+      setSnackbar({ open: true, message: 'Error saving plan', severity: 'error' });
+    }
   };
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <CircularProgress />
+        </Container>
+      </MainLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MainLayout>
+        <Container maxWidth="lg">
+        <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
+                  Voltar para o Dashboard
+        </Button>
+          <Typography variant="h6" color="error" align="center">
+            {error}
+          </Typography>
+        </Container>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
       <Container maxWidth="lg">
+      <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
+                  Voltar para o Dashboard
+      </Button>
         <Typography variant="h4" gutterBottom sx={{ mt: 4, mb: 2 }}>
           Planejador de Grade Curricular
         </Typography>
@@ -113,30 +174,27 @@ const SchedulePlanner: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 Adicionar Disciplina
               </Typography>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel id="subject-select-label">Disciplina</InputLabel>
+                <Select
+                  labelId="subject-select-label"
+                  id="subject-select"
+                  value={selectedSubjectCode}
+                  label="Disciplina"
+                  onChange={(e) => setSelectedSubjectCode(e.target.value as string)}
+                >
+                  {subjects.map((subject) => (
+                    <MenuItem key={subject.code} value={subject.code}>
+                      {subject.name} ({subject.code})
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <TextField
-                select
                 fullWidth
-                label="Disciplina"
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-                SelectProps={{
-                  native: true,
-                }}
-                sx={{ mb: 2 }}
-              >
-                <option value="">Selecione uma disciplina</option>
-                {mockSubjects.map((subject) => (
-                  <option key={subject.id} value={subject.id}>
-                    {subject.name}
-                  </option>
-                ))}
-              </TextField>
-              <TextField
-                type="number"
-                fullWidth
-                label="Semestre"
-                value={selectedSemester}
-                onChange={(e) => setSelectedSemester(Number(e.target.value))}
+                label="Período (ex: 2025.1)"
+                value={currentPeriod}
+                onChange={(e) => setCurrentPeriod(e.target.value)}
                 sx={{ mb: 2 }}
               />
               <Button
@@ -156,22 +214,22 @@ const SchedulePlanner: React.FC = () => {
                 Sua Grade Curricular
               </Typography>
               {semesters.map((semester) => (
-                <Box key={semester.id} sx={{ mb: 2 }}>
+                <Box key={semester.period} sx={{ mb: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>
-                    {`${semester.id}º Semestre`}
+                    {`Período: ${semester.period}`}
                   </Typography>
                   <List>
                     {semester.subjects.map((subject) => (
-                      <ListItem key={subject.id}>
+                      <ListItem key={subject.code}>
                         <ListItemText
                           primary={subject.name}
-                          secondary={`Créditos: ${subject.credits}`}
+                          secondary={`Código: ${subject.code}`}
                         />
                         <ListItemSecondaryAction>
                           <IconButton
                             edge="end"
                             aria-label="delete"
-                            onClick={() => handleRemoveSubject(semester.id, subject.id)}
+                            onClick={() => handleRemoveSubject(semester.period, subject.code)}
                           >
                             <DeleteIcon />
                           </IconButton>

@@ -43,6 +43,9 @@ const PostList: React.FC = () => {
 
   return (
     <MainLayout>
+      <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
+        Voltar para o Dashboard
+      </Button>
       <Container maxWidth="md">
         <Box sx={{ mt: 4, mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h4">
@@ -81,11 +84,6 @@ const PostList: React.FC = () => {
             ))}
           </List>
         </Paper>
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
-            Voltar para o Dashboard
-          </Button>
-        </Box>
       </Container>
     </MainLayout>
   );

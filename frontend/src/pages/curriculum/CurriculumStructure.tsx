@@ -1,17 +1,17 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
-    Box,
-    Button,
-    Chip,
-    Container,
-    List,
-    ListItemButton,
-    ListItemText,
-    Paper,
-    Typography
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Chip,
+  Container,
+  List,
+  ListItemButton,
+  ListItemText,
+  Paper,
+  Typography
 } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -47,14 +47,13 @@ const mockCurriculum: Semester[] = [
       { id: 'PHYS201', name: 'Física II', type: 'mandatory', credits: 4, prerequisites: ['PHYS101'] },
     ]
   },
-  // Add more semesters as needed
 ];
 
 const CurriculumStructure: React.FC = () => {
   const navigate = useNavigate();
   const [expandedSemester, setExpandedSemester] = useState<number | false>(false);
 
-  const handleChange = (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+  const handleChange = (panel: number) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpandedSemester(isExpanded ? panel : false);
   };
 

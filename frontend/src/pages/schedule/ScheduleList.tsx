@@ -1,15 +1,16 @@
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import {
-    Box,
-    Button,
-    Container,
-    IconButton,
-    List,
-    ListItem,
-    ListItemSecondaryAction,
-    ListItemText,
-    Paper,
-    Typography
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  IconButton,
+  List,
+  ListItem,
+  ListItemSecondaryAction,
+  ListItemText,
+  Paper,
+  Typography
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,67 +22,111 @@ interface SchedulePlan {
   createdAt: string;
 }
 
-const mockPlans: SchedulePlan[] = [
-  { id: 1, name: 'Plano 2025 - 1º semestre', createdAt: '2025-01-15' },
-  { id: 2, name: 'Plano 2025 - 2º semestre', createdAt: '2025-06-20' },
-  { id: 3, name: 'Plano 2026 - Completo', createdAt: '2025-12-01' },
-];
-
 const ScheduleList: React.FC = () => {
   const navigate = useNavigate();
   const [plans, setPlans] = useState<SchedulePlan[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // In a real application, you would fetch the plans from an API
-    setPlans(mockPlans);
-  }, []);
+  const fetchPlans = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/schedule/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar os planos');
+      }
+
+      const data: SchedulePlan[] = await response.json();
+      setPlans(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro desconhecido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePlan = async (planId: number) => {
+    try {
+      const response = await fetch(`/schedule/${planId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao excluir o plano');
+      }
+
+      setPlans((prevPlans) => prevPlans.filter((plan) => plan.id !== planId));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro desconhecido ao excluir o plano');
+    }
+  };
 
   const handleEditPlan = (planId: number) => {
-    // Navigate to the SchedulePlanner with the selected plan
     navigate(`/schedule/planner/${planId}`);
   };
 
-  const handleDeletePlan = (planId: number) => {
-    // In a real application, you would send a delete request to an API
-    setPlans(prevPlans => prevPlans.filter(plan => plan.id !== planId));
-  };
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
 
   return (
     <MainLayout>
+      <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
+          Voltar para o Dashboard
+      </Button>
       <Container maxWidth="md">
         <Typography variant="h4" gutterBottom sx={{ mt: 4, mb: 2 }}>
           Seus Planos de Grade Curricular
         </Typography>
-        <Paper elevation={3} sx={{ p: 2 }}>
-          <List>
-            {plans.map((plan) => (
-              <ListItem key={plan.id}>
-                <ListItemText
-                  primary={plan.name}
-                  secondary={`Criado em: ${new Date(plan.createdAt).toLocaleDateString()}`}
-                />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" aria-label="edit" onClick={() => handleEditPlan(plan.id)}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeletePlan(plan.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
+
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error" align="center">
+            {error}
+          </Typography>
+        ) : (
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <List>
+              {plans.map((plan) => (
+                <ListItem key={plan.id}>
+                  <ListItemText
+                    primary={plan.name}
+                    secondary={`Criado em: ${new Date(plan.createdAt).toLocaleDateString()}`}
+                  />
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" aria-label="edit" onClick={() => handleEditPlan(plan.id)}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton edge="end" aria-label="delete" onClick={() => handleDeletePlan(plan.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        )}
+
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-          <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
-            Voltar para o Dashboard
-          </Button>
           <Button variant="contained" color="primary" onClick={() => navigate('/schedule/planner')}>
             Criar Novo Plano
           </Button>
         </Box>
       </Container>
-    </MainLayout>
+  </MainLayout>
   );
 };
 

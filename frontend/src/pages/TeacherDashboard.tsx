@@ -1,5 +1,5 @@
+import { Button, Grid, Paper, Typography } from '@mui/material';
 import React from 'react';
-import { Typography, Grid, Paper, Button } from '@mui/material';
 import MainLayout from '../layouts/MainLayout';
 
 const TeacherDashboard: React.FC = () => {
@@ -25,12 +25,6 @@ const TeacherDashboard: React.FC = () => {
             <Button variant="contained" color="primary" sx={{ mt: 2 }}>
               Criar Nova Postagem
             </Button>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Materiais</Typography>
-            {/* Adicionar visualização de materiais */}
           </Paper>
         </Grid>
       </Grid>
