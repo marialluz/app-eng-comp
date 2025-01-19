@@ -1,4 +1,4 @@
-import { Upload } from '@mui/icons-material';
+import { Upload } from "@mui/icons-material";
 import {
   Box,
   Breadcrumbs,
@@ -9,33 +9,38 @@ import {
   MenuItem,
   Paper,
   Select,
-  Typography
-} from '@mui/material';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
+  Typography,
+} from "@mui/material";
+import { Link as RouterDomLink } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MainLayout from "../../layouts/MainLayout";
 
 const FileUpload = () => {
   const navigate = useNavigate();
-  const [directory, setDirectory] = useState('');
+  const [directory, setDirectory] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
   const handleUpload = (event: React.FormEvent) => {
     event.preventDefault();
     // Lógica de upload aqui
-    navigate('/materials');
+    navigate("/materials");
   };
 
   return (
     <MainLayout>
-      <Box sx={{ display: 'flex', justifyContent: 'center'}}>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Box p={3}>
-          <Breadcrumbs
-          aria-label="breadcrumb" sx={{ mb: 3 }}>
-            <Link color="inherit" href="/dashboard/student">
+          <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
+            <Link
+              component={RouterDomLink}
+              to="/dashboard/student"
+              color="inherit"
+            >
               Dashboard
             </Link>
-            <Link color="inherit" href="/materials">
+
+            <Link color="inherit" component={RouterDomLink} to="/materials">
               Materiais
             </Link>
             <Typography color="text.primary">Upload</Typography>

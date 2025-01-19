@@ -1,8 +1,9 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
+import { useUserStore } from "../stores/user";
+import { api } from "../config/api";
 
 interface LoginForm {
   username: string;
@@ -38,19 +39,17 @@ const Login: React.FC = () => {
     }));
   };
 
-  const getUserInfo = async (token: string) => {
+  const getUserInfo = async () => {
     try {
-      const response = await axios.get<UserResponse>('http://localhost:8000/user/me/', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.get<UserResponse>("/user/me/");
       return response.data;
     } catch (err) {
-      console.error('Erro ao buscar informações do usuário:', err);
+      console.error("Erro ao buscar informações do usuário:", err);
       throw err;
     }
   };
+
+  const { setAccessToken, setRefreshToken, setUserInfo } = useUserStore();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -58,8 +57,8 @@ const Login: React.FC = () => {
 
     try {
       // 1. Fazer login e obter tokens
-      const loginResponse = await axios.post<LoginResponse>(
-        "http://localhost:8000/auth/token/",
+      const loginResponse = await api.post<LoginResponse>(
+        "/auth/token/",
         formData
       );
 
@@ -67,16 +66,15 @@ const Login: React.FC = () => {
       const refreshToken = loginResponse.data.refresh;
 
       // 2. Salvar tokens
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      
-      // 3. Configurar token para próximas requisições
-      axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+      setAccessToken(accessToken);
+      setRefreshToken(refreshToken);
 
-      // 4. Buscar informações do usuário
-      const userInfo = await getUserInfo(accessToken);
+      // 3. Buscar informações do usuário
+      const userInfo = await getUserInfo();
 
-      // 5. Redirecionar com base no tipo de usuário
+      setUserInfo(userInfo);
+
+      // 4. Redirecionar com base no tipo de usuário
       if (userInfo.is_teacher) {
         navigate("/dashboard/teacher");
       } else if (userInfo.is_student) {
@@ -84,11 +82,11 @@ const Login: React.FC = () => {
       } else {
         setError("Tipo de usuário não identificado");
       }
-
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.detail || 
-                          err?.response?.data?.message ||
-                          "Erro ao fazer login. Por favor, tente novamente mais tarde.";
+      const errorMessage =
+        err?.response?.data?.detail ||
+        err?.response?.data?.message ||
+        "Erro ao fazer login. Por favor, tente novamente mais tarde.";
       setError(errorMessage);
     }
   };
@@ -96,7 +94,6 @@ const Login: React.FC = () => {
   const handleClickRegister = () => {
     navigate("/register");
   };
-
 
   return (
     <MainLayout>

@@ -1,4 +1,4 @@
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -10,11 +10,12 @@ import {
   ListItemSecondaryAction,
   ListItemText,
   Paper,
-  Typography
-} from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MainLayout from "../../layouts/MainLayout";
+import { api } from "../../config/api";
 
 interface SchedulePlan {
   id: number;
@@ -32,20 +33,11 @@ const ScheduleList: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/schedule/', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const { data } = await api.get<SchedulePlan[]>("/schedule/");
 
-      if (!response.ok) {
-        throw new Error('Erro ao buscar os planos');
-      }
-
-      const data: SchedulePlan[] = await response.json();
       setPlans(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      setError(err instanceof Error ? err.message : "Erro desconhecido");
     } finally {
       setLoading(false);
     }
@@ -53,20 +45,15 @@ const ScheduleList: React.FC = () => {
 
   const handleDeletePlan = async (planId: number) => {
     try {
-      const response = await fetch(`/schedule/${planId}/`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao excluir o plano');
-      }
+      await api.delete(`/schedule/${planId}/`);
 
       setPlans((prevPlans) => prevPlans.filter((plan) => plan.id !== planId));
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro desconhecido ao excluir o plano');
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Erro desconhecido ao excluir o plano"
+      );
     }
   };
 
@@ -78,11 +65,10 @@ const ScheduleList: React.FC = () => {
     fetchPlans();
   }, []);
 
-
   return (
     <MainLayout>
-      <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
-          Voltar para o Dashboard
+      <Button variant="outlined" onClick={() => navigate("/dashboard/student")}>
+        Voltar para o Dashboard
       </Button>
       <Container maxWidth="md">
         <Typography variant="h4" gutterBottom sx={{ mt: 4, mb: 2 }}>
@@ -90,7 +76,7 @@ const ScheduleList: React.FC = () => {
         </Typography>
 
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <CircularProgress />
           </Box>
         ) : error ? (
@@ -104,13 +90,23 @@ const ScheduleList: React.FC = () => {
                 <ListItem key={plan.id}>
                   <ListItemText
                     primary={plan.name}
-                    secondary={`Criado em: ${new Date(plan.createdAt).toLocaleDateString()}`}
+                    secondary={`Criado em: ${new Date(
+                      plan.createdAt
+                    ).toLocaleDateString()}`}
                   />
                   <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="edit" onClick={() => handleEditPlan(plan.id)}>
+                    <IconButton
+                      edge="end"
+                      aria-label="edit"
+                      onClick={() => handleEditPlan(plan.id)}
+                    >
                       <EditIcon />
                     </IconButton>
-                    <IconButton edge="end" aria-label="delete" onClick={() => handleDeletePlan(plan.id)}>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => handleDeletePlan(plan.id)}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </ListItemSecondaryAction>
@@ -120,15 +116,18 @@ const ScheduleList: React.FC = () => {
           </Paper>
         )}
 
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-          <Button variant="contained" color="primary" onClick={() => navigate('/schedule/planner')}>
+        <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/schedule/planner")}
+          >
             Criar Novo Plano
           </Button>
         </Box>
       </Container>
-  </MainLayout>
+    </MainLayout>
   );
 };
 
 export default ScheduleList;
-

@@ -1,18 +1,30 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, IconButton, Button } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Button,
+  Box,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../stores/user";
+import { LogoutOutlined } from "@mui/icons-material";
 
 interface NavbarProps {
   toggleSidebar: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
+  const { username, accessToken, refreshToken, clearTokens } = useUserStore();
+  const isAuthenticated = accessToken || refreshToken;
   const navigate = useNavigate();
 
-  const handleClickLogin = () => {
+  const navigateToLogin = () => {
     navigate("/login");
   };
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -29,9 +41,33 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           CompFlow
         </Typography>
-        <Button color="inherit" onClick={handleClickLogin}>
-          Login
-        </Button>
+        {isAuthenticated ? (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography>{username}</Typography>
+            <Button
+              sx={{
+                all: "unset",
+                display: "flex",
+                alignItems: "center",
+                transition: "all .2s linear",
+                ":hover": { color: "red" },
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                clearTokens();
+                navigateToLogin();
+              }}
+              color="inherit"
+              size="small"
+            >
+              <LogoutOutlined />
+            </Button>
+          </Box>
+        ) : (
+          <Button color="inherit" onClick={navigateToLogin}>
+            Login
+          </Button>
+        )}
       </Toolbar>
     </AppBar>
   );

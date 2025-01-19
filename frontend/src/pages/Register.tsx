@@ -1,72 +1,60 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, FormControlLabel, Checkbox } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  FormControlLabel,
+  Checkbox,
+  Alert,
+} from "@mui/material";
 import MainLayout from "../layouts/MainLayout";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { api } from "../config/api";
+import { RegisterData, registerSchema } from "../schemas/register";
 
 const Register: React.FC = () => {
-  const [isStudent, setIsStudent] = useState(false);
-  const [isTeacher, setIsTeacher] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [serverErrorMessage, setServerErrorMessage] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<RegisterData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const isStudent = watch("is_student");
+
   const navigate = useNavigate();
 
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const name = event.target.value;
-    setFullName(name);
-  };
+  const registerTextField = (name: keyof RegisterData) => ({
+    ...register(name),
+    error: !!errors[name]?.message,
+    helperText: errors[name]?.message,
+  });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const userData = {
-      username: formData.get("name"),
-      email: formData.get("email"),
-      password: formData.get("password"),
-      confirm_password: formData.get("confirmPassword"),
-      is_student: isStudent,
-      is_teacher: isTeacher,
-      entry_period: formData.get("entry_period"),
-    };
-
-    console.log(userData)
-
-    try {
-      const response = await fetch("http://localhost:8000/user/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (response.ok) {
-        navigate("/login");
-      } else {
-        const data = await response.json();
-        console.log(data);
-        setErrorMessage(data?.non_field_errors || "Erro desconhecido");
-      }
-    } catch (error) {
-      console.error("Erro ao registrar o usuário", error);
-      
-      setErrorMessage("Erro ao registrar o usuário. Tente novamente mais tarde.");
-    }
-  };
-
-  const handleClickLogin = () => {
+  const navigateToLogin = () => {
     navigate("/login");
   };
 
-  const handleStudentChange = () => {
-    setIsStudent(true);
-    setIsTeacher(false);
-  };
-
-  const handleTeacherChange = () => {
-    setIsTeacher(true);
-    setIsStudent(false);
-  };
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      const { data } = await api.post("http://localhost:8000/user/", values);
+      console.log({ data });
+      navigateToLogin();
+    } catch (error) {
+      const errorMessage = (error as any)?.response?.data
+        ?.non_field_errors?.[0];
+      setServerErrorMessage(
+        errorMessage ||
+          "Erro ao registrar o usuário. Tente novamente mais tarde."
+      );
+    }
+  });
 
   return (
     <MainLayout>
@@ -76,7 +64,6 @@ const Register: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           mt: 8,
-          width: 1863,
         }}
       >
         <Typography component="h1" variant="h5" align="center" gutterBottom>
@@ -84,89 +71,100 @@ const Register: React.FC = () => {
         </Typography>
         <Box
           component="form"
-          onSubmit={handleSubmit}
-          sx={{ mt: 1, display: "flex", flexDirection: "column", width: 400 }}
+          onSubmit={onSubmit}
+          sx={{
+            mt: 1,
+            display: "flex",
+            flexDirection: "column",
+            width: 400,
+          }}
         >
           <TextField
             margin="normal"
             required
             fullWidth
-            id="name"
-            label="Nome completo"
-            name="name"
-            autoComplete="name"
-            value={fullName}
-            onChange={handleNameChange}
+            label="Usuário"
+            autoComplete="username"
             autoFocus
+            {...registerTextField("username")}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            id="email"
             label="Email"
-            name="email"
             autoComplete="email"
+            {...registerTextField("email")}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            name="password"
             label="Senha"
             type="password"
-            id="password"
-            autoComplete="new-password"
+            {...registerTextField("password")}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            name="confirmPassword"
             label="Confirmar senha"
             type="password"
-            id="confirmPassword"
+            {...registerTextField("confirm_password")}
           />
           <TextField
             margin="normal"
             fullWidth
-            required
-            name="entry_period"
+            required={isStudent}
             label="Período de ingresso"
-            id="entry_period"
+            {...registerTextField("entry_period")}
           />
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={isStudent}
-                onChange={handleStudentChange}
-                color="primary"
-              />
-            }
-            label="Aluno?"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={isTeacher}
-                onChange={handleTeacherChange}
-                color="primary"
-              />
-            }
-            label="Professor?"
-          />
+          <Box>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  {...register("is_student")}
+                  color={errors.is_student?.message ? "error" : "primary"}
+                />
+              }
+              label="Aluno?"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  {...register("is_teacher")}
+                  color={errors.is_teacher?.message ? "error" : "primary"}
+                />
+              }
+              label="Professor?"
+            />
 
-          {errorMessage && (
-            <Typography color="error" variant="body2" align="center" sx={{ mt: 2 }}>
-              {errorMessage}
-            </Typography>
+            {errors.is_student?.message && (
+              <Typography variant="body2" color="error">
+                {errors.is_student?.message}
+              </Typography>
+            )}
+          </Box>
+
+          {serverErrorMessage && (
+            <Alert sx={{ mt: 2 }} severity="error">
+              {serverErrorMessage}
+            </Alert>
           )}
 
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
             Registrar
           </Button>
-          <Button onClick={handleClickLogin} sx={{ all: "unset", cursor: "pointer" }}>
+          <Button
+            onClick={navigateToLogin}
+            sx={{ all: "unset", cursor: "pointer" }}
+          >
             <Typography variant="body2" align="center">
               Já tem uma conta? Faça login
             </Typography>

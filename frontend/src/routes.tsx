@@ -1,115 +1,135 @@
-import { RouteObject } from 'react-router-dom';
-import CurriculumStructure from './pages/curriculum/CurriculumStructure';
-import PreRequisites from './pages/curriculum/PreRequisites';
-import SubjectDetails from './pages/curriculum/SubjectDetails';
-import LandingPage from './pages/LandingPage';
-import Login from './pages/Login';
-import DirectoryList from './pages/materials/DirectoryList';
-import DirectoryView from './pages/materials/DirectoryView';
-import FileShare from './pages/materials/FileShare';
-import FileUpload from './pages/materials/FileUpload';
-import PostCreate from './pages/posts/PostCreate';
-import PostList from './pages/posts/PostList';
-import PostView from './pages/posts/PostView';
-import Register from './pages/Register';
-import ScheduleList from './pages/schedule/ScheduleList';
-import SchedulePlanner from './pages/schedule/SchedulePlanner';
-import StudentDashboard from './pages/StudentDashboard';
-import TeacherDashboard from './pages/TeacherDashboard';
+import { Navigate, Outlet, RouteObject } from "react-router-dom";
+import CurriculumStructure from "./pages/curriculum/CurriculumStructure";
+import PreRequisites from "./pages/curriculum/PreRequisites";
+import SubjectDetails from "./pages/curriculum/SubjectDetails";
+import LandingPage from "./pages/LandingPage";
+import Login from "./pages/Login";
+import DirectoryList from "./pages/materials/DirectoryList";
+import DirectoryView from "./pages/materials/DirectoryView";
+import FileShare from "./pages/materials/FileShare";
+import FileUpload from "./pages/materials/FileUpload";
+import PostCreate from "./pages/posts/PostCreate";
+import PostList from "./pages/posts/PostList";
+import PostView from "./pages/posts/PostView";
+import Register from "./pages/Register";
+import ScheduleList from "./pages/schedule/ScheduleList";
+import SchedulePlanner from "./pages/schedule/SchedulePlanner";
+import StudentDashboard from "./pages/StudentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import { useUserStore } from "./stores/user";
+
+const ProtectedRoute = () => {
+  const { accessToken, refreshToken } = useUserStore();
+  const isAuthenticated = accessToken || refreshToken;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  return (
+    <>
+      <Outlet />
+    </>
+  );
+};
 
 export const routes: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <LandingPage />,
   },
   {
-    path: '/login',
+    path: "/login",
     element: <Login />,
   },
   {
-    path: '/register',
+    path: "/register",
     element: <Register />,
   },
   {
-    path: '/dashboard',
+    element: <ProtectedRoute />,
+    path: "/dashboard",
     children: [
       {
-        path: 'student',
+        path: "student",
         element: <StudentDashboard />,
       },
       {
-        path: 'teacher',
+        path: "teacher",
         element: <TeacherDashboard />,
       },
     ],
-   },  
-   {
-    path: '/materials',
+  },
+  {
+    element: <ProtectedRoute />,
+    path: "/materials",
     children: [
       {
-        path: '',
+        path: "",
         element: <DirectoryList />,
       },
       {
-        path: ':directoryId',
+        path: ":directoryId",
         element: <DirectoryView />,
       },
       {
-        path: 'upload',
+        path: "upload",
         element: <FileUpload />,
       },
       {
-        path: 'share/:fileId',
+        path: "share/:fileId",
         element: <FileShare />,
       },
     ],
-   },
+  },
   {
-    path: '/curriculum',
+    element: <ProtectedRoute />,
+    path: "/curriculum",
     children: [
       {
-        path: '',
+        path: "",
         element: <CurriculumStructure />,
       },
       {
-        path: ':subjectId',
+        path: ":subjectId",
         element: <SubjectDetails />,
       },
       {
-        path: 'prerequisites/:subjectId',
+        path: "prerequisites/:subjectId",
         element: <PreRequisites />,
       },
     ],
   },
   {
-    path: '/schedule',
+    element: <ProtectedRoute />,
+    path: "/schedule",
     children: [
       {
-        path: 'planner',
+        path: "planner",
         element: <SchedulePlanner />,
       },
       {
-        path: 'list',
+        path: "list",
         element: <ScheduleList />,
       },
     ],
   },
   {
-    path: '/posts',
+    element: <ProtectedRoute />,
+    path: "/posts",
     children: [
       {
-        path: '',
+        path: "",
         element: <PostList />,
       },
       {
-        path: 'create',
+        path: "create",
         element: <PostCreate />,
       },
       {
-        path: ':postId',
+        path: ":postId",
         element: <PostView />,
       },
     ],
   },
 ];
-
