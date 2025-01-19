@@ -129,7 +129,7 @@ const CurriculumStructure: React.FC = () => {
 
   return (
     <MainLayout>
-      <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
+      <Button variant="outlined" onClick={() => navigate(is_teacher ? '/dashboard/teacher' : '/dashboard/student')}>
         Voltar para o Dashboard
       </Button>
       <Container maxWidth="lg">
