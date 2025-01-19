@@ -15,14 +15,21 @@ class SubjectSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         prerequisites = data.get("prerequisites", [])
-        code = data.get("code")
+        code = data.get("code", self.instance.code if self.instance else None)
 
-        if code and code in prerequisites:
-            raise serializers.ValidationError(
-                "Uma disciplina não pode ser pré-requisito de si mesma."
+        # Converte os códigos dos pré-requisitos em instâncias do modelo
+        prerequisites_instances = Subject.objects.filter(
+            code__in=[p.code if isinstance(p, Subject) else p for p in prerequisites]
+        )
+
+        # Para atualizações parciais, combine os pré-requisitos existentes com os novos
+        if self.instance:
+            prerequisites_instances = list(self.instance.prerequisites.all()) + list(
+                prerequisites_instances
             )
 
-        if self.instance and self.instance.code in prerequisites:
+        # Validação: disciplina não pode ser pré-requisito de si mesma
+        if code and code in [prereq.code for prereq in prerequisites_instances]:
             raise serializers.ValidationError(
                 "Uma disciplina não pode ser pré-requisito de si mesma."
             )

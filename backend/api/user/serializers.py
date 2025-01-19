@@ -26,12 +26,13 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
-        if data["password"] != data["confirm_password"]:
-            raise serializers.ValidationError(
-                {"password": "As senhas não são compatíveis."}
-            )
+        if "password" in data and "confirm_password" in data:
+            if data["password"] != data["confirm_password"]:
+                raise serializers.ValidationError(
+                    {"password": "As senhas não são compatíveis."}
+                )
 
-        if User.objects.filter(email=data["email"]).exists():
+        if "email" in data and User.objects.filter(email=data["email"]).exists():
             raise serializers.ValidationError(
                 {"email": "Este email já está registrado."}
             )

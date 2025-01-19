@@ -6,6 +6,8 @@ from .validators import semester_format
 
 
 class User(AbstractUser):
-    entry_period = models.CharField(max_length=6, validators=[semester_format])
+    entry_period = models.CharField(
+        max_length=6, validators=[semester_format], null=True, blank=True
+    )
     is_student = models.BooleanField(default=False)
     is_teacher = models.BooleanField(default=False)
