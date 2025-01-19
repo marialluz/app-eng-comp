@@ -19,12 +19,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const getMenuItems = () => {
     const commonItems = [
       { text: "Notícias", icon: <AnnouncementIcon />, path: "/posts" },
+      { text: "Grade Curricular", icon: <CalendarTodayIcon />, path: "/curriculum" },
     ];
 
     if (is_student) {
       return [
         { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard/student" },
-        { text: "Grade Curricular", icon: <CalendarTodayIcon />, path: "/curriculum" },
         { text: "Materiais", icon: <FolderIcon />, path: "/materials" },
         ...commonItems,
       ];

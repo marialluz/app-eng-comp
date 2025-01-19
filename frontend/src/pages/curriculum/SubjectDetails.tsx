@@ -1,54 +1,46 @@
-import {
-    Box,
-    Button,
-    Chip,
-    Container,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    Paper,
-    Typography
-} from '@mui/material';
-import React from 'react';
+import { Box, Button, Container, List, ListItemButton, ListItemText, Paper, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { api } from '../../config/api';
 import MainLayout from '../../layouts/MainLayout';
 
-// This would typically come from an API or a larger data store
-const mockSubjects = {
-  'COMP101': { 
-    id: 'COMP101', 
-    name: 'Introdução à Computação', 
-    type: 'mandatory', 
-    credits: 4, 
-    prerequisites: [],
-    description: 'Esta disciplina fornece uma introdução aos conceitos fundamentais da ciência da computação e programação.',
-    objectives: [
-      'Compreender os conceitos básicos de algoritmos',
-      'Aprender a lógica de programação',
-      'Familiarizar-se com uma linguagem de programação de alto nível'
-    ]
-  },
-  'COMP201': { 
-    id: 'COMP201', 
-    name: 'Estruturas de Dados', 
-    type: 'mandatory', 
-    credits: 4, 
-    prerequisites: ['COMP101'],
-    description: 'Esta disciplina aborda as principais estruturas de dados utilizadas em programação e sua aplicação.',
-    objectives: [
-      'Compreender e implementar estruturas de dados básicas e avançadas',
-      'Analisar a complexidade de algoritmos',
-      'Aplicar estruturas de dados na resolução de problemas computacionais'
-    ]
-  },
-  // Add more subjects as needed
-};
+interface Subject {
+  code: string;
+  name: string;
+  period: string;
+  prerequisites: string[];
+}
 
 const SubjectDetails: React.FC = () => {
-  const { subjectId } = useParams<{ subjectId: string }>();
+  const { subjectCode } = useParams<{ subjectCode: string }>();
   const navigate = useNavigate();
-  const subject = mockSubjects[subjectId as keyof typeof mockSubjects];
+  const [subject, setSubject] = useState<Subject | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!subjectCode) return;
+    const fetchSubject = async () => {
+      try {
+        const response = await api.get(`/subject/${subjectCode}/`);
+        const subjectData = response.data as Subject;
+        // Certifique-se de que prerequisites seja sempre um array
+        setSubject({
+          ...subjectData,
+          prerequisites: subjectData.prerequisites || [],
+        });
+      } catch {
+        setSubject(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchSubject();
+  }, [subjectCode]);
+
+  if (loading) {
+    return <Typography>Carregando...</Typography>;
+  }
 
   if (!subject) {
     return <Typography>Disciplina não encontrada</Typography>;
@@ -61,52 +53,32 @@ const SubjectDetails: React.FC = () => {
           {subject.name}
         </Typography>
         <Paper elevation={3} sx={{ p: 3 }}>
-          <Box sx={{ mb: 2 }}>
-            <Chip 
-              label={subject.type === 'mandatory' ? 'Obrigatória' : subject.type === 'elective' ? 'Eletiva' : 'Optativa'} 
-              color={subject.type === 'mandatory' ? 'primary' : subject.type === 'elective' ? 'secondary' : 'default'}
-            />
-            <Typography variant="subtitle1" sx={{ mt: 1 }}>
-              Créditos: {subject.credits}
-            </Typography>
-          </Box>
-          
-          <Typography variant="h6" gutterBottom>Descrição</Typography>
-          <Typography paragraph>{subject.description}</Typography>
-          
-          <Typography variant="h6" gutterBottom>Objetivos</Typography>
-          <List>
-            {subject.objectives.map((objective, index) => (
-              <ListItem key={index}>
-                <ListItemText primary={objective} />
-              </ListItem>
-            ))}
-          </List>
-          
           <Typography variant="h6" gutterBottom>Pré-requisitos</Typography>
-          {subject.prerequisites.length > 0 ? (
+          {subject.prerequisites && subject.prerequisites.length > 0 ? (
+            console.log('Pré-requisitos:', subject.prerequisites),
             <List>
-              {subject.prerequisites.map((prereq) => (
+              {subject.prerequisites.map((prereqCode) => (
                 <ListItemButton
-                  key={prereq}
-                  onClick={() => navigate(`/curriculum/${prereq}`)}
+                  key={prereqCode}
+                  onClick={() => navigate(`/curriculum/${prereqCode}`)}
                 >
-                  <ListItemText
-                    primary={mockSubjects[prereq as keyof typeof mockSubjects]?.name || prereq}
-                  />
+                  <ListItemText primary={prereqCode} />
                 </ListItemButton>
               ))}
-            </List>            
+            </List>
           ) : (
             <Typography>Não há pré-requisitos para esta disciplina.</Typography>
           )}
-          
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
             <Button variant="outlined" onClick={() => navigate('/curriculum')}>
               Voltar para a Estrutura Curricular
             </Button>
             {subject.prerequisites.length > 0 && (
-              <Button variant="contained" color="primary" onClick={() => navigate(`/curriculum/prerequisites/${subject.id}`)}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate(`/curriculum/prerequisites/${subject.code}`)}
+              >
                 Ver Árvore de Pré-requisitos
               </Button>
             )}
@@ -118,4 +90,3 @@ const SubjectDetails: React.FC = () => {
 };
 
 export default SubjectDetails;
-

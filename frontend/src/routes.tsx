@@ -91,11 +91,11 @@ export const routes: RouteObject[] = [
         element: <CurriculumStructure />,
       },
       {
-        path: ":subjectId",
+        path: ":subjectCode",
         element: <SubjectDetails />,
       },
       {
-        path: "prerequisites/:subjectId",
+        path: "prerequisites/:subjectCode",
         element: <PreRequisites />,
       },
     ],

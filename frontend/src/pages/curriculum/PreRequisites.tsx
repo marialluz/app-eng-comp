@@ -1,89 +1,171 @@
-import styled from '@emotion/styled';
-import {
-    Box,
-    Button,
-    Container,
-    Paper,
-    Typography
-} from '@mui/material';
-import React from 'react';
+import { Box, Button, Container, Paper, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Tree, TreeNode } from "react-organizational-chart";
+import { useNavigate, useParams } from "react-router-dom";
+import { api } from "../../config/api";
+import MainLayout from "../../layouts/MainLayout";
 
-import { Tree, TreeNode } from 'react-organizational-chart';
-import { useNavigate, useParams } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
+const StyledNode: React.FC<{ children: React.ReactNode; onClick: () => void }> = ({ children, onClick }) => (
+  <div
+    onClick={onClick}
+    style={{
+      padding: "5px",
+      borderRadius: "8px",
+      display: "inline-block",
+      border: "1px solid #1976d2",
+      cursor: "pointer"
+    }}
+  >
+    {children}
+  </div>
+);
 
-// This would typically come from an API or a larger data store
-const mockSubjects = {
-  'COMP101': { id: 'COMP101', name: 'Introdução à Computação', prerequisites: [] },
-  'COMP201': { id: 'COMP201', name: 'Estruturas de Dados', prerequisites: ['COMP101'] },
-  'COMP301': { id: 'COMP301', name: 'Algoritmos Avançados', prerequisites: ['COMP201'] },
-  'COMP401': { id: 'COMP401', name: 'Inteligência Artificial', prerequisites: ['COMP301', 'MATH201'] },
-  'MATH101': { id: 'MATH101', name: 'Cálculo I', prerequisites: [] },
-  'MATH201': { id: 'MATH201', name: 'Cálculo II', prerequisites: ['MATH101'] },
-  // Add more subjects as needed
-};
-
-const StyledNode = styled.div`
-  padding: 5px;
-  border-radius: 8px;
-  display: inline-block;
-  border: 1px solid #1976d2;
-`;
+interface Subject {
+  code: string;
+  name: string;
+  period: string | number;
+  prerequisites: string[];
+}
 
 const PreRequisites: React.FC = () => {
-  const { subjectId } = useParams<{ subjectId: string }>();
+  const { subjectCode } = useParams<{ subjectCode: string }>();
   const navigate = useNavigate();
-  const subject = mockSubjects[subjectId as keyof typeof mockSubjects];
+  const [subjectsMap, setSubjectsMap] = useState<Map<string, Subject>>(new Map());
+  const [rootSubject, setRootSubject] = useState<Subject | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!subject) {
-    return <Typography>Disciplina não encontrada</Typography>;
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!subjectCode) return;
 
-  const renderTree = (subjectId: string): React.ReactNode => {
-    const subject = mockSubjects[subjectId as keyof typeof mockSubjects];
+      setLoading(true);
+      try {
+        // Primeiro, buscar a disciplina principal
+        const mainSubjectResponse = await api.get(`/subject/${subjectCode}`);
+        const mainSubject = mainSubjectResponse.data as Subject;
+        
+        // Depois, buscar os pré-requisitos
+        const prereqsResponse = await api.get(`/subject/${subjectCode}/prerequisites/?deep=true`);
+        const prerequisites = prereqsResponse.data as Subject[];
+        
+        console.log("Main subject:", mainSubject);
+        console.log("Prerequisites:", prerequisites);
+        
+        // Criar o mapa com todos os subjects
+        const newSubjectsMap = new Map();
+        
+        // Adicionar primeiro a disciplina principal
+        newSubjectsMap.set(mainSubject.code, mainSubject);
+        
+        // Adicionar os pré-requisitos
+        prerequisites.forEach(subject => {
+          newSubjectsMap.set(subject.code, subject);
+        });
+        
+        console.log("Final map:", Array.from(newSubjectsMap.entries()));
+        
+        setSubjectsMap(newSubjectsMap);
+        setRootSubject(mainSubject);
+      } catch (error) {
+        console.error("Erro ao carregar os pré-requisitos:", error);
+        setRootSubject(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [subjectCode]);
+
+  const renderTree = (subject: Subject): React.ReactNode => {
+    if (!subject) return null;
+
     return (
-      <TreeNode 
+      <TreeNode
         label={
-          <StyledNode onClick={() => navigate(`/curriculum/${subject.id}`)}>
-            {subject.name}
+          <StyledNode onClick={() => navigate(`/curriculum/${subject.code}`)}>
+            {subject.name} ({subject.code})
           </StyledNode>
         }
       >
-        {subject.prerequisites.map((prereqId) => renderTree(prereqId))}
+        {subject.prerequisites && subject.prerequisites.length > 0 ? (
+          subject.prerequisites.map((prereqCode) => {
+            const prereq = subjectsMap.get(prereqCode);
+            return prereq ? renderTree(prereq) : null;
+          })
+        ) : (
+          <TreeNode 
+            label={
+              <StyledNode onClick={() => {}}>
+                Nenhum pré-requisito
+              </StyledNode>
+            }
+          />
+        )}
       </TreeNode>
     );
   };
 
+  if (loading) {
+    return (
+      <MainLayout>
+        <Container maxWidth="lg">
+          <Typography>Carregando...</Typography>
+        </Container>
+      </MainLayout>
+    );
+  }
+
+  if (!rootSubject) {
+    return (
+      <MainLayout>
+        <Container maxWidth="lg">
+          <Typography>Disciplina não encontrada (Código: {subjectCode})</Typography>
+          <Typography variant="body2" color="textSecondary">
+            Subjects disponíveis: {Array.from(subjectsMap.keys()).join(", ")}
+          </Typography>
+        </Container>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
-      <Container maxWidth="lg">
-        <Typography variant="h4" gutterBottom sx={{ mt: 4, mb: 2 }}>
-          Árvore de Pré-requisitos: {subject.name}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'start', gap: 2}} >
+        <Button
+          variant="outlined"
+           onClick={() => navigate(`/curriculum/${subjectCode}`)}
+        >
+           Voltar para Detalhes da Disciplina
+        </Button>
+        <Button
+           variant="contained"
+           color="primary"
+           onClick={() => navigate("/curriculum")}
+        >
+          Ver Estrutura Curricular Completa
+        </Button>
+      </Box>
+      <Container maxWidth="lg" >
+        <Typography variant="h4" gutterBottom>
+          Árvore de Pré-requisitos: {rootSubject.name}
         </Typography>
-        <Paper elevation={3} sx={{ p: 3, overflowX: 'auto' }}>
-          <Box sx={{ minWidth: 600, pb: 3 }}>
+        <Paper elevation={3}>
+          <Box sx={{ p: 2 }}>
             <Tree
-              lineWidth={'2px'}
-              lineColor={'#bbb'}
-              lineBorderRadius={'10px'}
+              lineWidth="2px"
+              lineColor="#bbb"
+              lineBorderRadius="10px"
               label={<div>Árvore de Pré-requisitos</div>}
             >
-              {renderTree(subject.id)}
+              {renderTree(rootSubject)}
             </Tree>
           </Box>
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="outlined" onClick={() => navigate(`/curriculum/${subject.id}`)}>
-              Voltar para Detalhes da Disciplina
-            </Button>
-            <Button variant="contained" color="primary" onClick={() => navigate('/curriculum')}>
-              Ver Estrutura Curricular Completa
-            </Button>
-          </Box>
         </Paper>
+        
       </Container>
     </MainLayout>
   );
 };
 
 export default PreRequisites;
-
