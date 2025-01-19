@@ -1,16 +1,16 @@
-import React from "react";
+import { LogoutOutlined } from "@mui/icons-material";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
+  Box,
+  Button,
+  IconButton,
   Toolbar,
   Typography,
-  IconButton,
-  Button,
-  Box,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/user";
-import { LogoutOutlined } from "@mui/icons-material";
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -20,7 +20,9 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   const { username, accessToken, refreshToken, clearTokens } = useUserStore();
   const isAuthenticated = accessToken || refreshToken;
   const navigate = useNavigate();
-
+  const navigateToLandingPage = () => {
+    navigate("/");
+  }
   const navigateToLogin = () => {
     navigate("/login");
   };
@@ -38,7 +40,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: "pointer" }} onClick={navigateToLandingPage}>
           CompFlow
         </Typography>
         {isAuthenticated ? (

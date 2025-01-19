@@ -3,6 +3,7 @@ import React from 'react';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import { useUserStore } from '../stores/user';
 
 const theme = createTheme({
   palette: {
@@ -35,6 +36,8 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children, hideSidebar = false }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const { accessToken, refreshToken } = useUserStore();
+  const isAuthenticated = accessToken || refreshToken;
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -46,7 +49,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, hideSidebar = false }
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100vw' }}>
         <Navbar toggleSidebar={toggleSidebar} />
         <Box sx={{ display: 'flex', flex: 1 }}>
-          {!hideSidebar && <Sidebar open={sidebarOpen} onClose={toggleSidebar} />}
+          {isAuthenticated && !hideSidebar && <Sidebar open={sidebarOpen} onClose={toggleSidebar} />}
           <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             {children}
           </Box>
