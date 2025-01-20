@@ -19,7 +19,7 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-environ.Env.read_env(BASE_DIR.__str__() + "/../../.env")
+environ.Env.read_env(BASE_DIR.__str__() + "/../.env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -159,7 +159,7 @@ AUTH_USER_MODEL = "user.User"
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY")
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
 
 AWS_STORAGE_BUCKET_NAME = "pesapresentacao"

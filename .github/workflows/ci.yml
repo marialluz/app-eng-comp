@@ -32,6 +32,12 @@ jobs:
         run: |
           poetry install
 
+      - name: Set up .env file
+        working-directory: backend
+        run: |
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+
       - name: Run tests
         working-directory: backend/api
         run: |
