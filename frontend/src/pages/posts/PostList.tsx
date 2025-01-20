@@ -1,93 +1,205 @@
-import {
-  Box,
-  Button,
-  Container,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemText,
-  Paper,
-  Typography
-} from '@mui/material';
+import { Alert, Box, Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Snackbar, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { api } from '../../config/api';
 import MainLayout from '../../layouts/MainLayout';
+import { useUserStore } from '../../stores/user';
 
-interface Post {
-  id: number;
-  title: string;
-  date: string;
-  summary: string;
+interface PostRequest {
+  file: File | null; // Arquivo anexado (se houver)
+  text: string; // Texto da postagem
 }
 
 const PostList: React.FC = () => {
-  const navigate = useNavigate();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const BASE_URL = "http://localhost:8000";
+  const { is_teacher } = useUserStore(); // Verifica se o usuário é professor
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Controle do dialog
+  const [newPost, setNewPost] = useState<PostRequest>({ file: null, text: '' }); // Dados da nova postagem
+  const [posts, setPosts] = useState<any[]>([]); // Lista de postagens
+  const [error, setError] = useState<string>(''); // Mensagem de erro
+  const [showError, setShowError] = useState(false); // Exibe a mensagem de erro
 
-  useEffect(() => {
-    // In a real application, you would fetch the posts from an API
-    // For this example, we'll use mock data
-    const mockPosts: Post[] = [
-      { id: 1, title: "Prazo de entrega para TCC prorrogado", date: "12/01/2025", summary: "O prazo para entrega do TCC foi estendido por mais duas semanas." },
-      { id: 2, title: "Novo calendário de provas divulgado", date: "11/01/2025", summary: "O novo calendário de provas para o semestre atual já está disponível." },
-      { id: 3, title: "Palestra sobre Inteligência Artificial", date: "10/01/2025", summary: "Na próxima semana, teremos uma palestra sobre os avanços recentes em IA." },
-      { id: 4, title: "Inscrições abertas para monitoria", date: "09/01/2025", summary: "As inscrições para monitoria nas disciplinas do próximo semestre estão abertas." },
-      { id: 5, title: "Manutenção programada nos laboratórios", date: "08/01/2025", summary: "Os laboratórios de informática estarão fechados para manutenção no próximo fim de semana." },
-    ];
-    setPosts(mockPosts);
-  }, []);
-
-  const handlePostClick = (postId: number) => {
-    navigate(`/posts/${postId}`);
+  // Função para buscar as postagens
+  const fetchPosts = async () => {
+    try {
+      const response = await api.get('/post/');
+      setPosts(response.data as PostRequest[]);
+    } catch (error) {
+      console.error('Erro ao buscar postagens:', error);
+      setError('Erro ao buscar postagens');
+      setShowError(true);
+    }
   };
+
+  // Função para criar uma nova postagem
+  const handleCreatePost = async () => {
+    if (!newPost.text) {
+      setError('Texto da postagem é obrigatório');
+      setShowError(true);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('text', newPost.text);
+
+    if (newPost.file) {
+      formData.append('file', newPost.file); // Adiciona o arquivo, se houver
+    }
+
+    try {
+      await api.post('/post/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Adicionar token de autenticação, se necessário
+        },
+      });
+
+      setIsDialogOpen(false); // Fechar o dialog
+      setNewPost({ file: null, text: '' }); // Limpar dados do formulário
+      fetchPosts(); // Atualizar lista de postagens
+
+    } catch (error) {
+      console.error('Erro ao criar a postagem:', error);
+      setError('Erro ao criar a postagem');
+      setShowError(true);
+    }
+  };
+
+  // Abrir o Dialog de criação de postagem
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  // Fechar o Dialog
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  // Lidar com a mudança de texto da postagem
+  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewPost({ ...newPost, text: event.target.value });
+  };
+
+  // Lidar com a mudança do arquivo
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setNewPost({ ...newPost, file: event.target.files[0] });
+    }
+  };
+
+  // Carregar as postagens ao montar o componente
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   return (
     <MainLayout>
-      <Button variant="outlined" onClick={() => navigate('/dashboard/student')}>
-        Voltar para o Dashboard
-      </Button>
-      <Container maxWidth="md">
-        <Box sx={{ mt: 4, mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">
-            Notícias
-          </Typography>
-          <Button variant="contained" color="primary" onClick={() => navigate('/posts/create')}>
-            Criar Nova Notícia
-          </Button>
-        </Box>
-        <Paper elevation={3}>
-          <List>
-            {posts.map((post, index) => (
-              <React.Fragment key={post.id}>
-                <ListItemButton
-                  alignItems="flex-start"
-                  onClick={() => handlePostClick(post.id)}
+    <Paper sx={{ padding: 2 }}>
+      {/* Botão para criar nova postagem, visível apenas para professores */}
+      {is_teacher && (
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={handleOpenDialog}
+          sx={{ mb: 2 }}
+        >
+          Criar Nova Notícia
+        </Button>
+      )}
+
+      {/* Exibição da lista de postagens */}
+      <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '1rem' }}>
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <Card key={post.id} sx={{ mb: 2 }}>
+              <CardContent>
+                <Typography variant="h6" component="div">
+                  {post.text}
+                </Typography>
+                {post.file && (
+                  <Typography variant="body2" color="text.secondary">
+                    <a href={`${BASE_URL}${post.file}`} target="_blank" rel="noopener noreferrer">
+                      Ver Anexo
+                    </a>
+                  </Typography>
+                )}
+                <Typography variant="body2" color="text.secondary">
+                  Criado por: {post.created_by.username}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Data: {new Date(post.created_at).toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <Typography variant="body1">Nenhuma postagem encontrada.</Typography>
+        )}
+      </div>
+
+      {/* Dialog para criar nova postagem */}
+      <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center' }}>Criar Nova Notícia</DialogTitle>
+        <DialogContent sx={{ paddingTop: 2 }}>
+          <Box>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Texto da Postagem"
+              required
+              fullWidth
+              value={newPost.text}
+              onChange={handleTextChange}
+              multiline
+              rows={4}
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+            <Box sx={{ mb: 2 }}>
+              {/* Substituindo o input de arquivo pelo botão de upload estilizado */}
+              <TextField
+                type="file"
+                inputProps={{ accept: "image/*,application/pdf,application/msword" }}
+                onChange={handleFileChange}
+                sx={{
+                  display: 'none', // Esconde o input original
+                }}
+                id="file-upload"
+              />
+              <label htmlFor="file-upload">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  sx={{ width: '100%' }}
                 >
-                  <ListItemText
-                    primary={post.title}
-                    secondary={
-                      <React.Fragment>
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          color="text.primary"
-                        >
-                          {post.date}
-                        </Typography>
-                        {" — " + post.summary}
-                      </React.Fragment>
-                    }
-                  />
-                </ListItemButton>
-                {index < posts.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
-        </Paper>
-      </Container>
+                  Anexar Arquivo
+                </Button>
+              </label>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ padding: '16px' }}>
+          <Button onClick={handleCloseDialog} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleCreatePost} color="primary" variant="contained">
+            Criar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Exibição de erro, caso haja */}
+      <Snackbar
+        open={showError}
+        autoHideDuration={6000}
+        onClose={() => setShowError(false)}
+      >
+        <Alert onClose={() => setShowError(false)} severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
+    </Paper>
     </MainLayout>
   );
 };
 
 export default PostList;
-

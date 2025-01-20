@@ -1,17 +1,17 @@
-import React, { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  Alert,
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
   TextField,
   Typography,
-  FormControlLabel,
-  Checkbox,
-  Alert,
 } from "@mui/material";
-import MainLayout from "../layouts/MainLayout";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
+import MainLayout from "../layouts/MainLayout";
 
 import { api } from "../config/api";
 import { RegisterData, registerSchema } from "../schemas/register";
@@ -43,12 +43,17 @@ const Register: React.FC = () => {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const { data } = await api.post("http://localhost:8000/user/", values);
+      // Remove o campo entry_period se is_teacher for true
+      const payload = { ...values };
+      if (payload.is_teacher) {
+        delete payload.entry_period;
+      }
+  
+      const { data } = await api.post("http://localhost:8000/user/", payload);
       console.log({ data });
       navigateToLogin();
     } catch (error) {
-      const errorMessage = (error as any)?.response?.data
-        ?.non_field_errors?.[0];
+      const errorMessage = (error as any)?.response?.data?.non_field_errors?.[0];
       setServerErrorMessage(
         errorMessage ||
           "Erro ao registrar o usuário. Tente novamente mais tarde."

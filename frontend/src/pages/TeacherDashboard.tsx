@@ -6,6 +6,7 @@ import MainLayout from '../layouts/MainLayout';
 const TeacherDashboard: React.FC = () => {
   const navigate = useNavigate();
   const handleNavigateToCurriculum = () => navigate("/curriculum");
+  const handleNavigateToPosts = () => navigate("/posts");
 
   return (
     <MainLayout>
@@ -26,8 +27,8 @@ const TeacherDashboard: React.FC = () => {
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6">Postagens</Typography>
             {/* Adicionar lista de postagens recentes */}
-            <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-              Criar Nova Postagem
+            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleNavigateToPosts}>
+              Ver postagens
             </Button>
           </Paper>
         </Grid>

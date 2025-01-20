@@ -8,7 +8,6 @@ import DirectoryList from "./pages/materials/DirectoryList";
 import DirectoryView from "./pages/materials/DirectoryView";
 import FileShare from "./pages/materials/FileShare";
 import FileUpload from "./pages/materials/FileUpload";
-import PostCreate from "./pages/posts/PostCreate";
 import PostList from "./pages/posts/PostList";
 import PostView from "./pages/posts/PostView";
 import Register from "./pages/Register";
@@ -121,10 +120,6 @@ export const routes: RouteObject[] = [
       {
         path: "",
         element: <PostList />,
-      },
-      {
-        path: "create",
-        element: <PostCreate />,
       },
       {
         path: ":postId",

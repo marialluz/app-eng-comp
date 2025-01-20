@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MainLayout from "../layouts/MainLayout";
 import { api } from "../config/api";
+import MainLayout from "../layouts/MainLayout";
 
 interface Directory {
   id: number;
@@ -39,6 +39,10 @@ const StudentDashboard: React.FC = () => {
   const [recentPlannings, setRecentPlannings] = useState<Planning[]>([]);
   const [loadingPlannings, setLoadingPlannings] = useState(true);
   const [errorPlannings, setErrorPlannings] = useState<string | null>(null);
+
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [errorPosts, setErrorPosts] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const handleNavigateToMaterials = () => navigate("/materials");
@@ -111,6 +115,75 @@ const StudentDashboard: React.FC = () => {
       </React.Fragment>
     ));
   };
+
+  const fetchRecentPosts = async () => {
+    try {
+      setLoadingPosts(true);
+      const { data: posts } = await api.get<any[]>("/post/");
+  
+      // Ordenar as postagens por data (assumindo um campo `created_at`) e pegar as 2 mais recentes
+      const sortedPosts = posts
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
+        .slice(0, 2);
+  
+      setRecentPosts(sortedPosts);
+    } catch (err) {
+      setErrorPosts(
+        err instanceof Error ? err.message : "Erro ao carregar notícias"
+      );
+      console.error("Erro ao buscar notícias:", err);
+    } finally {
+      setLoadingPosts(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecentPosts();
+  }, []);
+
+  const renderPostsList = () => {
+    if (loadingPosts) {
+      return (
+        <div
+          style={{ display: "flex", justifyContent: "center", padding: "20px" }}
+        >
+          <CircularProgress size={24} />
+        </div>
+      );
+    }
+  
+    if (errorPosts) {
+      return (
+        <Typography color="error" align="center">
+          {errorPosts}
+        </Typography>
+      );
+    }
+  
+    if (!Array.isArray(recentPosts) || recentPosts.length === 0) {
+      return (
+        <ListItem>
+          <ListItemText primary="Nenhuma notícia disponível" />
+        </ListItem>
+      );
+    }
+  
+    return recentPosts.map((post, index) => (
+      <React.Fragment key={post.id}>
+        <ListItem>
+          <ListItemText
+            primary={post.text || "Título não disponível"}
+            secondary={`Data: ${new Date(post.created_at).toLocaleDateString()}`}
+          />
+        </ListItem>
+        {index < recentPosts.length - 1 && <Divider />}
+      </React.Fragment>
+    ));
+  };
+  
 
   const fetchRecentFiles = async () => {
     try {
@@ -276,21 +349,7 @@ const StudentDashboard: React.FC = () => {
             <Typography variant="h6" gutterBottom>
               Últimas Notícias
             </Typography>
-            <List>
-              <ListItem>
-                <ListItemText
-                  primary="Prazo de entrega para TCC prorrogado"
-                  secondary="Data: 12/01/2025"
-                />
-              </ListItem>
-              <Divider />
-              <ListItem>
-                <ListItemText
-                  primary="Novo calendário de provas divulgado"
-                  secondary="Data: 11/01/2025"
-                />
-              </ListItem>
-            </List>
+            <List>{renderPostsList()}</List>
             <Button
               variant="contained"
               color="primary"
