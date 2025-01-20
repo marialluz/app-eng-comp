@@ -4,6 +4,10 @@ import {
   Button,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   List,
   ListItem,
@@ -19,22 +23,26 @@ import MainLayout from "../../layouts/MainLayout";
 
 interface SchedulePlan {
   id: number;
-  name: string;
-  createdAt: string;
+  period: string;
+  subjects: string[];
 }
 
 const ScheduleList: React.FC = () => {
   const navigate = useNavigate();
   const [plans, setPlans] = useState<SchedulePlan[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<SchedulePlan | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogLoading, setDialogLoading] = useState(false);
+  const [dialogError, setDialogError] = useState<string | null>(null);
+  const [planDetails, setPlanDetails] = useState<any>(null);
 
   const fetchPlans = async () => {
     setLoading(true);
     setError(null);
     try {
       const { data } = await api.get<SchedulePlan[]>("/schedule/");
-
       setPlans(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro desconhecido");
@@ -43,11 +51,27 @@ const ScheduleList: React.FC = () => {
     }
   };
 
-  const handleDeletePlan = async (planId: number) => {
+  const fetchPlanDetails = async (planId: number) => {
+    setDialogLoading(true);
+    setDialogError(null);
+    try {
+      const { data } = await api.get(`/schedule/${planId}/`);
+      setPlanDetails(data);
+    } catch (err) {
+      setDialogError(err instanceof Error ? err.message : "Erro ao carregar detalhes do plano");
+    } finally {
+      setDialogLoading(false);
+    }
+  };
+
+  const handleDeletePlan = async (event: React.MouseEvent, planId: number) => {
+    event.stopPropagation();
     try {
       await api.delete(`/schedule/${planId}/`);
-
       setPlans((prevPlans) => prevPlans.filter((plan) => plan.id !== planId));
+      if (selectedPlan?.id === planId) {
+        setDialogOpen(false);
+      }
     } catch (err) {
       alert(
         err instanceof Error
@@ -57,44 +81,67 @@ const ScheduleList: React.FC = () => {
     }
   };
 
+  const handlePlanClick = (plan: SchedulePlan) => {
+    setSelectedPlan(plan);
+    setDialogOpen(true);
+    fetchPlanDetails(plan.id);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedPlan(null);
+    setPlanDetails(null);
+    setDialogError(null);
+  };
+
   useEffect(() => {
     fetchPlans();
   }, []);
 
   return (
     <MainLayout>
-      <Button variant="outlined" onClick={() => navigate("/dashboard/student")}>
-        Voltar para o Dashboard
-      </Button>
       <Container maxWidth="md">
-        <Typography variant="h4" gutterBottom sx={{ mt: 4, mb: 2 }}>
-          Seus Planos de Grade Curricular
-        </Typography>
+        <Box mb={2}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/dashboard/student")}
+          >
+            Voltar para o Dashboard
+          </Button>
+        </Box>
 
-        {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Typography color="error" align="center">
-            {error}
+        <Paper sx={{ p: 2 }}>
+          <Typography variant="h5" gutterBottom>
+            Seus Planos de Grade Curricular
           </Typography>
-        ) : (
-          <Paper elevation={3} sx={{ p: 2 }}>
+
+          {loading ? (
+            <Box display="flex" justifyContent="center" p={3}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography color="error">{error}</Typography>
+          ) : (
             <List>
               {plans.map((plan) => (
-                <ListItem key={plan.id}>
+                <ListItem
+                  key={plan.period}
+                  onClick={() => handlePlanClick(plan)}
+                  sx={{
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    },
+                  }}
+                >
                   <ListItemText
-                    primary={plan.name}
-                    secondary={`Criado em: ${new Date(
-                      plan.createdAt
-                    ).toLocaleDateString()}`}
+                    primary={plan.period}
+                    secondary={plan.subjects.join(", ")}
                   />
                   <ListItemSecondaryAction>
                     <IconButton
                       edge="end"
-                      aria-label="delete"
-                      onClick={() => handleDeletePlan(plan.id)}
+                      onClick={(e) => handleDeletePlan(e, plan.id)}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -102,18 +149,52 @@ const ScheduleList: React.FC = () => {
                 </ListItem>
               ))}
             </List>
-          </Paper>
-        )}
+          )}
 
-        <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate("/schedule/planner")}
-          >
-            Criar Novo Plano
-          </Button>
-        </Box>
+          <Box mt={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/schedule/planner")}
+            >
+              Criar Novo Plano
+            </Button>
+          </Box>
+        </Paper>
+
+        <Dialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            {selectedPlan?.period}
+          </DialogTitle>
+          <DialogContent>
+            {dialogLoading ? (
+              <Box display="flex" justifyContent="center" p={3}>
+                <CircularProgress />
+              </Box>
+            ) : dialogError ? (
+              <Typography color="error">{dialogError}</Typography>
+            ) : planDetails ? (
+              <Box>
+                
+                {/* Aqui você pode adicionar mais detalhes do plano conforme necessário */}
+                <Typography variant="body1">
+                  {/* Renderize os detalhes do plano aqui baseado na estrutura do seu planDetails */}
+                  {JSON.stringify(planDetails, null, 2)}
+                </Typography>
+              </Box>
+            ) : null}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary">
+              Fechar
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </MainLayout>
   );
