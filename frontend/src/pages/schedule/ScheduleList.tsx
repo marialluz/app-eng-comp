@@ -1,4 +1,4 @@
-import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
+import { Delete as DeleteIcon } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -14,8 +14,8 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MainLayout from "../../layouts/MainLayout";
 import { api } from "../../config/api";
+import MainLayout from "../../layouts/MainLayout";
 
 interface SchedulePlan {
   id: number;
@@ -57,10 +57,6 @@ const ScheduleList: React.FC = () => {
     }
   };
 
-  const handleEditPlan = (planId: number) => {
-    navigate(`/schedule/planner/${planId}`);
-  };
-
   useEffect(() => {
     fetchPlans();
   }, []);
@@ -95,13 +91,6 @@ const ScheduleList: React.FC = () => {
                     ).toLocaleDateString()}`}
                   />
                   <ListItemSecondaryAction>
-                    <IconButton
-                      edge="end"
-                      aria-label="edit"
-                      onClick={() => handleEditPlan(plan.id)}
-                    >
-                      <EditIcon />
-                    </IconButton>
                     <IconButton
                       edge="end"
                       aria-label="delete"
