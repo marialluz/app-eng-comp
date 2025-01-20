@@ -251,3 +251,5 @@ $ docker run -d -p 8000:8000 compflow
 ```
 
 Após isso, a aplicação estará rodando em http://localhost:8000/
+
+.
