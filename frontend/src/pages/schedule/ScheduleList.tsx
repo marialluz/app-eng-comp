@@ -19,8 +19,8 @@ import MainLayout from "../../layouts/MainLayout";
 
 interface SchedulePlan {
   id: number;
-  name: string;
-  createdAt: string;
+  subjects: string[];
+  period: string;
 }
 
 const ScheduleList: React.FC = () => {
@@ -85,10 +85,8 @@ const ScheduleList: React.FC = () => {
               {plans.map((plan) => (
                 <ListItem key={plan.id}>
                   <ListItemText
-                    primary={plan.name}
-                    secondary={`Criado em: ${new Date(
-                      plan.createdAt
-                    ).toLocaleDateString()}`}
+                    primary={`Período: ${plan.period}`}
+                    secondary={plan.subjects?.join(", ")}
                   />
                   <ListItemSecondaryAction>
                     <IconButton

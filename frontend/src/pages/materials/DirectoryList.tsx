@@ -1,4 +1,4 @@
-import { Add, Folder, Upload } from '@mui/icons-material';
+import { Add, Folder, Upload } from "@mui/icons-material";
 import {
   Box,
   Breadcrumbs,
@@ -9,44 +9,74 @@ import {
   ListItemIcon,
   ListItemText,
   Paper,
-  Typography
-} from '@mui/material';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
-
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MainLayout from "../../layouts/MainLayout";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../../config/api";
+import { CreateDirectoryModal } from "./CreateDirectoryModal";
+import { Subject } from "../../types/subject";
+import { Dir } from "../../types/dir";
 
 const DirectoryList = () => {
   const navigate = useNavigate();
-  const [directories] = useState([
-    { id: '1', name: 'Matemática', filesCount: 5 },
-    { id: '2', name: 'Física', filesCount: 3 },
-    { id: '3', name: 'Programação', filesCount: 7 }
-  ]);
+
+  const [isCreateDirectoryOpen, setIsCreateDirectoryOpen] = useState(false);
+
+  const { data: subjects } = useQuery({
+    queryKey: ["subjects"],
+    queryFn: async () => {
+      const { data: responseData } = await api.get<Array<Subject>>("/subject");
+      return responseData;
+    },
+  });
+
+  const { data: directories } = useQuery({
+    queryKey: ["directories"],
+    queryFn: async () => {
+      const { data: responseData } = await api.get<Array<Dir>>("/directory");
+      return responseData;
+    },
+  });
+
+  const toggleCreateDirectory = () => {
+    setIsCreateDirectoryOpen(!isCreateDirectoryOpen);
+  };
 
   return (
     <MainLayout>
-      <Button variant="outlined" onClick={() => navigate('/dashboard/student')} sx={{ mb: 3 }}>
+      <CreateDirectoryModal
+        open={isCreateDirectoryOpen}
+        subjects={subjects ?? []}
+        handleClose={toggleCreateDirectory}
+      />
+
+      <Button
+        variant="outlined"
+        onClick={() => navigate("/dashboard/student")}
+        sx={{ mb: 3 }}
+      >
         Voltar para o Dashboard
       </Button>
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Box p={3}>
-          <Breadcrumbs  sx={{ mb: 3 }}>
-            <Typography variant="h4">
-              Materiais
-            </Typography>
+          <Breadcrumbs sx={{ mb: 3 }}>
+            <Typography variant="h4">Materiais</Typography>
           </Breadcrumbs>
           <Box display="flex" justifyContent="flex-end" mb={2} gap={2}>
             <Button
               variant="contained"
               startIcon={<Upload />}
-              onClick={() => navigate('/materials/upload')}
+              onClick={() => navigate("/materials/upload")}
             >
               Upload Arquivo
             </Button>
             <Button
               variant="contained"
               startIcon={<Add />}
+              onClick={toggleCreateDirectory}
             >
               Nova Pasta
             </Button>
@@ -54,16 +84,15 @@ const DirectoryList = () => {
 
           <Paper elevation={2}>
             <List>
-              {directories.map((dir) => (
+              {directories?.map((dir) => (
                 <ListItem key={dir.id} component="li">
-                  <ListItemButton onClick={() => navigate(`/materials/${dir.id}`)}>
+                  <ListItemButton
+                    onClick={() => navigate(`/materials/${dir.id}`)}
+                  >
                     <ListItemIcon>
                       <Folder color="primary" />
                     </ListItemIcon>
-                    <ListItemText
-                      primary={dir.name}
-                      secondary={`${dir.filesCount} arquivo(s)`}
-                    />
+                    <ListItemText primary={dir.subject} />
                   </ListItemButton>
                 </ListItem>
               ))}

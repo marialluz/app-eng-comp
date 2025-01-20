@@ -3,6 +3,7 @@ import {
   CircularProgress,
   Divider,
   Grid,
+  Link,
   List,
   ListItem,
   ListItemText,
@@ -22,6 +23,7 @@ interface Directory {
 interface File {
   id: number;
   name: string;
+  file: string;
   directory_id: number;
 }
 
@@ -120,7 +122,7 @@ const StudentDashboard: React.FC = () => {
     try {
       setLoadingPosts(true);
       const { data: posts } = await api.get<any[]>("/post/");
-  
+
       // Ordenar as postagens por data (assumindo um campo `created_at`) e pegar as 2 mais recentes
       const sortedPosts = posts
         .sort(
@@ -128,7 +130,7 @@ const StudentDashboard: React.FC = () => {
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         )
         .slice(0, 2);
-  
+
       setRecentPosts(sortedPosts);
     } catch (err) {
       setErrorPosts(
@@ -154,7 +156,7 @@ const StudentDashboard: React.FC = () => {
         </div>
       );
     }
-  
+
     if (errorPosts) {
       return (
         <Typography color="error" align="center">
@@ -162,7 +164,7 @@ const StudentDashboard: React.FC = () => {
         </Typography>
       );
     }
-  
+
     if (!Array.isArray(recentPosts) || recentPosts.length === 0) {
       return (
         <ListItem>
@@ -170,20 +172,21 @@ const StudentDashboard: React.FC = () => {
         </ListItem>
       );
     }
-  
+
     return recentPosts.map((post, index) => (
       <React.Fragment key={post.id}>
         <ListItem>
           <ListItemText
             primary={post.text || "Título não disponível"}
-            secondary={`Data: ${new Date(post.created_at).toLocaleDateString()}`}
+            secondary={`Data: ${new Date(
+              post.created_at
+            ).toLocaleDateString()}`}
           />
         </ListItem>
         {index < recentPosts.length - 1 && <Divider />}
       </React.Fragment>
     ));
   };
-  
 
   const fetchRecentFiles = async () => {
     try {
@@ -256,7 +259,11 @@ const StudentDashboard: React.FC = () => {
       <React.Fragment key={file.id || index}>
         <ListItem>
           <ListItemText
-            primary={file.name}
+            primary={
+              <Link href={file.file} target="_blank">
+                {file.name}
+              </Link>
+            }
             secondary={
               file.directory_id ? `Diretório: ${file.directory_id}` : undefined
             }
