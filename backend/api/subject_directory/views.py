@@ -31,17 +31,25 @@ class DirectoryFileViewSet(viewsets.ModelViewSet):
         directory_id = self.kwargs.get("directory_id")
 
         try:
-            directory = Directory.objects.get(id=directory)
+            directory = Directory.objects.get(id=directory_id)
             code = directory.subject.code
         except Directory.DoesNotExist:
             raise NotFound("Diretório não encontrado")
 
-        return DirectoryFile.objects.filter(
-            directory__id=directory_id, directory__user=user
-        ) | DirectoryFile.objects.filter(
-            shared_directory_files__shared_to_user=user,
-            shared_directory_files__directory__subject__code=code,
+        # Filtro para arquivos no diretório do usuário
+        queryset_1 = DirectoryFile.objects.filter(
+            directory_id=directory_id,
+            directory__user=user,
         )
+
+        # Filtro para arquivos compartilhados com o usuário no mesmo código de assunto
+        queryset_2 = DirectoryFile.objects.filter(
+            shared_directory_files__shared_to_user=user,
+            directory__subject__code=code,
+        )
+
+        # Combinação das queries
+        return queryset_1 | queryset_2
 
     def perform_create(self, serializer):
         directory_id = self.kwargs.get("directory_id")
