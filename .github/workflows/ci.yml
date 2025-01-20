@@ -35,14 +35,8 @@ jobs:
       - name: Set up .env file
         working-directory: backend
         run: |
-          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}" >> .env
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
-
-      - name: Debug .env file
-        working-directory: backend
-        run: |
-          echo "Conteúdo do .env:"
-          cat .env
 
       - name: Run tests
         working-directory: backend/api
