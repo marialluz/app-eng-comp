@@ -14,7 +14,7 @@ class Directory(models.Model):
 
 class DirectoryFile(models.Model):
     directory = models.ForeignKey(Directory, on_delete=models.CASCADE)
-    file = models.FileField(upload_to="directory_files/")
+    file = models.FileField()
     created_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=200)
 

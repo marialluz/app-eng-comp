@@ -9,4 +9,4 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     text = models.TextField()
-    file = models.FileField(upload_to="post_files/", blank=True, null=True)
+    file = models.FileField(blank=True, null=True)
